@@ -1,0 +1,18 @@
+
+- Page de connexion
+
+- Page liste d'articles
+
+- Pages des articles avec détails et commentaires
+
+- CRUD pour les catégories
+
+- suppression possible de l'article ou des commentaires par les proprio
+
+- Modif BDD : table User(id,email,mdp,pseudo,admin) connectée aux autres tables
+
+Les tables : 
+
+Article(id,titre,desc,categories,pseudo,commentaires)
+Catégorie(id,nom,articles)
+Commentaire(id,desc,article)

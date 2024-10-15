@@ -1,6 +1,8 @@
 <?php
-    require_once "includes/header.php";
-    require_once "includes/user_existe.php";
+require_once "includes/headerfunction.php";
+require_once "includes/user_existe.php";
+
+require_once "includes/header.php";
 ?>
 
 <form action="login.php" method="post">
@@ -17,7 +19,7 @@ if (!empty($_POST["email"]) && !empty($_POST["password"])) {
     $email = $_POST["email"];
     $password = $_POST["password"];
 
-    if (!user_existe($email)) {
+    if (user_existe($email)) {
         $user = login($email, $password);
         if ($user) {
             echo "utilisateur connecté";

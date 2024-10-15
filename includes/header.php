@@ -1,14 +1,4 @@
-<?php
 
-session_start();
-
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "blog";
-$dbport = 3306;
-
-?>
 
 <DOCTYPE html>
     <html lang="en">

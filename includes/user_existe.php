@@ -1,12 +1,11 @@
 <?php
-require_once "includes/header.php";
+require_once "includes/headerfunction.php";
 /*
  * if it exists:
  * - return user
  * if it does not exists:
  * - add a user
- *  * - return false
- *
+ * - return false
  */
 function user_existe($email)
 {
@@ -18,12 +17,12 @@ function user_existe($email)
         $stmt->execute([$email]);
 
         $user = $stmt->fetch();
-        return false;
-    } catch(PDOException $e) {
-        echo "SQL error: ".$e->getMessage();
-    }
-    return !$user;
+        return !!$user;
 
+    } catch (PDOException $e) {
+        echo "SQL error: " . $e->getMessage();
+    }
+    return false;
 }
 
 /*
@@ -38,7 +37,13 @@ function is_admin($mail, $mdp)
     }
 }
 
-function login($email, $password){
+/*
+ * vérify that password corresponds to the user password in data base
+ * return true if password corresponds
+ * else return false
+ */
+function login($email, $password)
+{
     try {
         $conn = new PDO('mysql:host=localhost;dbname=blog', 'root', '');
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -47,7 +52,6 @@ function login($email, $password){
         $stmt->execute([$email]);
 
         $user = $stmt->fetch();
-        var_dump($user, $password, password_verify($password, $user['password']));
         if ($user) {
             if (password_verify($password, $user['password'])) {
                 return $user;

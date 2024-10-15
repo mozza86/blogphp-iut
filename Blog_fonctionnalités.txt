@@ -1,5 +1,5 @@
 
-- Page de connexion
+- Page de connexion ok
 
 - Page liste d'articles
 

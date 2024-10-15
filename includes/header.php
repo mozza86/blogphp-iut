@@ -34,7 +34,8 @@ $dbport = 3306;
     <nav class="has-container">
         <div class="container">
             <div class="left">
-                <a href="">Create post</a>
+                <a href="./index.php">Home</a>
+                <a href="create_article.php">New article</a>
             </div>
             <div class="right">
                 <a href="account.php" class="account"><?= $_SESSION['user']['username'] ?? 'Login' ?><img src="<?= $_SESSION['user']['avatar_url'] ?? 'res/img/login.png' ?> " alt="avatar"></a>

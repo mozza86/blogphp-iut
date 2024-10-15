@@ -16,14 +16,12 @@ if(isset($_FILES['image'])){
         <label> Username :</label>
         <input type="text" name="username" id="username"> <br/>
         <label> Avatar :</label>
-        <input type="file" name="avatar" id="avatar"> <br/>
+        <input type="file" name="avatar" id="avatar" accept="image/*"> <br/>
 
         <label> Description</label>
         <input type="text" name="description" id="description"> <br/>
-        <label> Year : </label>
-        <input type="number" name="year" id="year"> <br/>
-        <label> Place </label>
-        <input type="text" name="place" id="place"> <br/>
+
+        <input type="submit">
     </form>
 </div>
 

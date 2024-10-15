@@ -5,7 +5,7 @@
 
 <form action="login.php" method="post">
     <label>Email : </label>
-    <input name="email" id="e_mail" type="text" placeholder="e-mail"/><br>
+    <input name="email" id="e_mail" type="email" placeholder="e-mail"/><br>
 
     <label>Mot de passe : </label>
     <input name="password" id="password" type="text" /><br>

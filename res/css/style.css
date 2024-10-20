@@ -1,173 +1,189 @@
 @import url("https://rsms.me/inter/inter.css");
-body, html {
-    height: 100%;
-}
-
-body {
-    font-family: "Inter", sans-serif;
-    font-size: 15px;
-    margin: 0;
+html > body {
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  margin: 0;
 }
 @supports (font-variation-settings: normal) {
-    body {
-        font-family: "Inter var", sans-serif;
-    }
+  html > body {
+    font-family: "Inter var", sans-serif;
+  }
 }
 @media (prefers-color-scheme: dark) {
-    body {
-        background-color: #222;
-        color: white;
-    }
-}
-
-.has-container > .container {
-    margin: auto;
-    box-sizing: border-box;
-    max-width: 1000px;
-}
-
-header, nav {
-    background-color: #ffac71;
+  html > body {
+    background-color: #222;
     color: white;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+  }
+}
+html > body header, html > body nav {
+  background-color: #ffac71;
+  color: white;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
 }
 @media (prefers-color-scheme: dark) {
-    header, nav {
-        background-color: #db935f;
-    }
+  html > body header, html > body nav {
+    background-color: #db935f;
+  }
 }
-header img, nav img {
-    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.2));
+html > body header img, html > body nav img {
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.2));
 }
-
-header > .container {
-    padding: 24px;
+html > body header > .container {
+  padding: 24px;
 }
-header > .container img {
-    height: 196px;
+html > body header > .container > img {
+  height: 196px;
 }
 @media (max-width: 721px) {
-    header > .container {
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-        text-align: center;
-    }
-}
-@media (min-width: 720px) {
-    header > .container {
-        display: flex;
-    }
-    header > .container img {
-        margin-right: 32px;
-    }
-}
-header > .container h1 {
-    font-size: 64px;
-    letter-spacing: -4px;
-    margin: 16px 0;
-}
-
-nav {
-    border-top: dashed 2px rgba(255, 255, 255, 0.16);
-}
-nav > .container {
-    padding: 0 16px;
-    justify-content: space-between;
-}
-nav > .container, nav > .container div {
-    display: flex;
-}
-nav > .container > div > a {
-    height: 40px;
-    font-weight: 600;
-    padding: 0 8px;
+  html > body header > .container {
     display: flex;
     align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
 }
-nav > .container > div > a:not(:hover) {
-    text-decoration: none;
+@media (min-width: 720px) {
+  html > body header > .container {
+    display: flex;
+  }
+  html > body header > .container > img {
+    margin-right: 32px;
+  }
+}
+html > body header > .container h1 {
+  font-size: 64px;
+  letter-spacing: -4px;
+  margin: 16px 0;
+}
+html > body header > .container .article_details {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+html > body header > .container .article_details h1 {
+  font-size: 54px;
+  margin: 0;
+}
+html > body header > .container .article_details p {
+  margin: 0;
+}
+html > body header > .container .article_details .author_card {
+  display: flex;
+}
+html > body header > .container .article_details .author_card img {
+  height: 60px;
+  width: 60px;
+  margin-right: 12px;
+}
+html > body header > .container .article_details .author_card .text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+html > body nav {
+  border-top: dashed 2px rgba(255, 255, 255, 0.16);
+}
+html > body nav > .container {
+  padding: 0 16px;
+  justify-content: space-between;
+}
+html > body nav > .container, html > body nav > .container div {
+  display: flex;
+}
+html > body nav > .container > div > a {
+  height: 40px;
+  font-weight: 600;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+}
+html > body nav > .container > div > a:not(:hover) {
+  text-decoration: none;
 }
 @media (hover: hover) {
-    nav > .container > div > a:hover {
-        color: #ffac71;
-        background: white;
-        text-shadow: none;
-    }
+  html > body nav > .container > div > a:hover {
+    color: #ffac71;
+    background: white;
+    text-shadow: none;
+  }
 }
-
-.articles > article:nth-child(2n-1) {
-    background-color: rgba(128, 128, 128, 0.05);
+html > body main.home article:nth-child(2n-1) {
+  background-color: rgba(128, 128, 128, 0.05);
 }
-.articles > article .container {
-    padding: 24px;
-    display: flex;
+html > body main.home article .container {
+  padding: 24px;
+  display: flex;
 }
-.articles > article .container img {
-    width: 200px;
-    height: 150px;
-    -o-object-fit: cover;
-    object-fit: cover;
-    margin-right: 32px;
-    border-radius: 6px;
-    border: solid rgba(128, 128, 128, 0.4) 2px;
+@media (max-width: 560px) {
+  html > body main.home article .container {
+    flex-direction: column;
+  }
+}
+html > body main.home article .container img {
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
+  margin-right: 32px;
+  border-radius: 6px;
+  border: solid rgba(128, 128, 128, 0.4) 2px;
+}
+@media (max-width: 560px) {
+  html > body main.home article .container img {
+    width: 100%;
+  }
+}
+html > body main.article img {
+  max-width: 100%;
+  height: 196px;
+}
+html > body .container {
+  margin: auto;
+  box-sizing: border-box;
+  max-width: 1000px;
+}
+html, html body {
+  height: 100%;
 }
 
 p {
-    line-height: 1.5;
+  line-height: 1.5;
 }
 
 a {
-    color: inherit;
+  color: inherit;
 }
 @media (hover: none) {
-    a {
-        cursor: none;
-    }
+  a {
+    cursor: none;
+  }
 }
 a.more {
-    color: #db935f;
-    font-weight: 600;
-    text-decoration: none;
+  color: #db935f;
+  font-weight: 600;
+  text-decoration: none;
 }
 a.more::before {
-    content: "-->";
-    transition: 0.2s;
-    margin-left: -20px;
-    opacity: 0;
+  content: "-->";
+  transition: 0.2s;
+  margin-left: -20px;
+  opacity: 0;
 }
 a.more:hover::before {
-    margin-left: 0px;
-    margin-right: 4px;
-    opacity: 1;
+  margin-left: 0px;
+  margin-right: 4px;
+  opacity: 1;
 }
 a.account img {
-    height: 30px;
-    width: 30px;
-    border-radius: 100%;
-    -o-object-fit: cover;
-    object-fit: cover;
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
+  object-fit: cover;
 }
 a.account img:first-child {
-    margin-right: 8px;
+  margin-right: 8px;
 }
 a.account img:last-child {
-    margin-left: 8px;
+  margin-left: 8px;
 }
-main {
-    display: flex;
-    justify-content: center;
-}
-article.page {
-    flex: 1;
-    background: red;
-    max-width: 1000px;
-}
-article.page .text {
-    font-size: 14px;
-    font-weight: normal;
-}
-article.page img {
-    height: 200px;
-    border-radius: 25px;
-}
+
+/*# sourceMappingURL=style.css.map */

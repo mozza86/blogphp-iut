@@ -16,7 +16,7 @@ require_once "includes/header.php";
 
         $conn = null;
         foreach  ($values as $row) {
-            $article_row = $row;
+            $article_row = $row;    
 
             include "includes/cartearticle.php";
         }

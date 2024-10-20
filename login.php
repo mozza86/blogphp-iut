@@ -1,13 +1,12 @@
 <?php
 require_once "includes/headerfunction.php";
-require_once "includes/user_existe.php";
-
 require_once "includes/header.php";
+require_once "includes/realheader.php";
+require_once "includes/nav.php";
 ?>
-
 <form action="login.php" method="post">
     <label>Email : </label>
-    <input name="email" id="e_mail" type="email" placeholder="e-mail"/><br>
+    <input name="email" type="email" placeholder="email"/><br>
 
     <label>Mot de passe : </label>
     <input name="password" id="password" type="text" /><br>
@@ -34,4 +33,8 @@ if (!empty($_POST["email"]) && !empty($_POST["password"])) {
     header('Location: account.php');
 }
 
+?>
+
+<?php
+require_once "includes/footer.php";
 ?>

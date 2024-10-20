@@ -1,6 +1,7 @@
 <?php
 require_once "includes/headerfunction.php";
-require_once "includes/user_existe.php";
+
+require_once "includes/user_functions.php";
 
 if (empty($_SESSION['user'])) {
     header('Location: login.php');
@@ -39,25 +40,34 @@ if (!empty($_POST['description'])) {
 require_once "includes/header.php";
 ?>
 
-<div>
-    <form method="post" action="account.php" enctype="multipart/form-data">
-        <label> Username :</label>
-        <input type="text" name="username" id="username"> <br/>
-
-        <label> Avatar :</label>
-        <input type="file" name="avatar" id="avatar" accept="image/*"> <br/>
-
-        <label> Description</label>
-        <input type="text" name="description" id="description"> <br/>
-
-        <input type="submit">
-    </form>
-    <form method="post" action="account.php">
-        <input type="submit" value="logout" name="logout">
-    </form>
-
+<div class="container">
+    <div class="home">
+        <img src="<?= $_SESSION['user']['avatar_url'] ?>">
+        <h1><?= $_SESSION['user']['username'] ?></h1>
+        <p><?= $_SESSION['user']['description'] ?></p>
+    </div>
 </div>
 
+<?php require_once "includes/nav.php"; ?>
 
-<?php
-require_once "includes/footer.php";
+<main>
+    <div class="container">
+        <form method="post" action="account.php" enctype="multipart/form-data">
+            <label> Username :</label>
+            <input type="text" name="username" id="username"> <br/>
+
+            <label> Avatar :</label>
+            <input type="file" name="avatar" id="avatar" accept="image/*"> <br/>
+
+            <label> Description</label>
+            <input type="text" name="description" id="description"> <br/>
+
+            <input type="submit">
+        </form>
+        <form method="post" action="">
+            <input type="submit" value="logout" name="logout">
+        </form>
+
+    </div>
+</main>
+<?php require_once "includes/footer.php";

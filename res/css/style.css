@@ -136,6 +136,14 @@ html > body main.article img {
   max-width: 100%;
   height: 196px;
 }
+html > body main .comment .author_card {
+  display: flex;
+  align-items: center;
+}
+html > body main .comment .author_card img {
+  height: 35px;
+  width: 35px;
+}
 html > body .container {
   margin: auto;
   box-sizing: border-box;

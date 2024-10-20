@@ -28,15 +28,12 @@ function user_existe($email)
 /*
  * return true if user is admin
  */
-function is_admin($mail, $mdp)
-{
-    if ($mail = "admin@localhost.fr" && $mdp = "admin69IUT") {
-        return true;
-    } else {
-        return false;
-    }
+function is_admin() {
+    return $_SESSION['user']['admin'] ?? 0;
 }
-
+function is_connected() {
+    return !empty($_SESSION['user']);
+}
 /*
  * vérify that password corresponds to the user password in data base
  * return true if password corresponds
@@ -71,7 +68,6 @@ function login($email, $password)
  */
 function creer_utilisateur($email, $password)
 {
-
     if ((filter_var($email, FILTER_VALIDATE_EMAIL))) {
         try {
             $conn = new PDO('mysql:host=localhost;dbname=blog', 'root', '');
@@ -85,7 +81,7 @@ function creer_utilisateur($email, $password)
         }
         return login($email, $password);
     } else {
-        echo "<script>window.alert('Hello world!');</script>);";
+        echo "email invalide";
     }
 }
 function update_avatar_url($user_id, $avatar_url)

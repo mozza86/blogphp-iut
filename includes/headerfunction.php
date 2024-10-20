@@ -12,8 +12,10 @@ function get_user_data($user_id) {
 
         $user = $stmt->fetch();
         return $user;
-    } catch(PDOException $e) {
-        echo "SQL error: ".$e->getMessage();
+    } catch (PDOException $e) {
+        die ('Erreur pdo' . $e->getMessage());
+    } catch (Exception $e) {
+        die('Erreur général' . $e->getMessage());
     }
     return false;
 }

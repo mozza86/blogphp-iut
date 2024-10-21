@@ -1,12 +1,12 @@
 <?php
 
 require_once "includes/user_existe.php";
-function add_article_database($title, $description){
+function add_article_database($title, $description, $categorie){
     try {
         $conn = new PDO('mysql:host=localhost;dbname=blog','root','');
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $conn->prepare("INSERT INTO articles(title, content, author_id) VALUES(?,?,?)");
-        $stmt->execute([$title, $description, $_SESSION["user"]['id']]);
+        $stmt = $conn->prepare("INSERT INTO articles(title, content, author_id, 	categorie) VALUES(?,?,?,?)");
+        $stmt->execute([$title, $description, $_SESSION["user"]['id'] , strtolower($categorie)]);
 
         return $conn->lastInsertId();
     } catch (PDOException $e){
@@ -31,5 +31,7 @@ function delete_article_database($title){
     }
 
 }
+function filtre_titre($titre){
 
+}
 ?>

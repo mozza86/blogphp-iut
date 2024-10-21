@@ -7,7 +7,7 @@ require_once "includes/nav.php";
 
 <main class="home">
     <?php
-
+    /* PDO */
     try {
         $conn = new PDO('mysql:host=localhost;dbname=blog','root','');
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

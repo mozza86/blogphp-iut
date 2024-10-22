@@ -108,13 +108,13 @@ if ($article_row) {
                         <input type="text" name="comment" placeholder="Commentaire">
                         <input type="submit" value="Envoyer">
                     </form>
-                <?php } ?>
                 <?php
+                }
 
                 try {
                     $conn = new PDO('mysql:host=localhost;dbname=blog','root','');
                     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                    $sql =  'SELECT c.content as content, u.username as username, u.avatar_url as avatar_url FROM comments c join users u on c.author_id = u.id where c.article_id = ? order by created_at desc limit 25';
+                    $sql =  'SELECT c.id, c.content as content, u.username as username, u.avatar_url as avatar_url FROM comments c join users u on c.author_id = u.id where c.article_id = ? order by created_at desc limit 25';
                     $stmt = $conn->prepare($sql);
                     $stmt->execute([$_GET['id']]);
                     $values = $stmt->fetchAll();
@@ -129,6 +129,11 @@ if ($article_row) {
                         <div class="author_card">
                             <img src="<?= $row['avatar_url'] ?>">
                             <span class="username"><?= htmlentities($row['username']) ?></span>
+                            <form action="article.php?id=<?= $_GET['id'] ?>" method="post">
+                                <input type="hidden" name="action" value="delete_comment">
+                                <input type="hidden" name="comment_id" value="<?= $row['id'] ?>">
+                                <input type="submit" value="Supprimer">
+                            </form>
                         </div>
                         <div class="text"><?= htmlentities($row['content']) ?></div>
                     </div>

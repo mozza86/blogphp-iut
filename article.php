@@ -23,7 +23,7 @@ if (!empty($_GET['id'])) {
 
 if ($article_row) {
     // supprime le post quand le bouton est cliqué
-    if (!empty($_POST['action']) && $_POST['action'] == "delete" && is_connected() && is_admin() || is_article_admin($article_row)) {
+    if (!empty($_POST['action']) && $_POST['action'] == "delete" && is_connected() && (is_admin() || is_article_admin($article_row))) {
         delete_article_database($_GET['id']);
     }
     if (!empty($_POST['action']) && $_POST['action'] == "new_comment" && !empty($_POST['comment']) && is_connected()) {
@@ -79,11 +79,13 @@ if ($article_row) {
         <div class="container">
             <fieldset>
                 <legend>Commentaire</legend>
-                <form action="article.php?id=<?= $_GET['id'] ?>" method="post">
-                    <input type="hidden" name="action" value="new_comment">
-                    <input type="text" name="comment" placeholder="Commentaire">
-                    <input type="submit" value="Envoyer">
-                </form>
+                <?php if (is_connected()) { ?>
+                    <form action="article.php?id=<?= $_GET['id'] ?>" method="post">
+                        <input type="hidden" name="action" value="new_comment">
+                        <input type="text" name="comment" placeholder="Commentaire">
+                        <input type="submit" value="Envoyer">
+                    </form>
+                <?php } ?>
                 <?php
 
                 try {

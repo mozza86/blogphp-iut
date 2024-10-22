@@ -17,7 +17,7 @@ if (!empty($_POST["author_name"])) {
     else
         document.getElementById('affichage').style.visibility=hidden;
 </script>
--->
+
 
         trier par
     <form action="filter.php" method="post">
@@ -26,6 +26,6 @@ if (!empty($_POST["author_name"])) {
 
         <button type="submit">Valider nom auteur</button>
     </form>
-
+-->
 
 

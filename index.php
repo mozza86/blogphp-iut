@@ -4,20 +4,22 @@ require_once "includes/header.php";
 require_once "includes/realheader.php";
 require_once "includes/nav.php";
 ?>
-    <form action="index.php" method="post">
+
+    <form action="index.php" method="post" class="formclass">
         <label>Filtre pour les titres :</label>
-        <input type="checkbox" id="filtrerpartitre" name="filtrerpartitre">
+        <input type="checkbox" id="filtrerpartitre" name="filtrerpartitre"> <br/>
         <label>Filtre pour les contenus :</label>
-        <input type="checkbox" id="filtrerparcontenu" name="filtrerparcontenu">
+        <input type="checkbox" id="filtrerparcontenu" name="filtrerparcontenu"> <br/>
         <label>Filtre par l'auteur :</label>
-        <input type="checkbox" id="filtrerparauteur" name="filtrerparauteur">
+        <input type="checkbox" id="filtrerparauteur" name="filtrerparauteur"> <br/>
+        <input type="text" id="valfiltre" name="valfiltre" placeholder="Entrez la valeur"> <br/>
+
         <select name="filtrerparcategorie" id="filtrerparcategorie">
             <option value="Aucun">Aucun</option>
             <option value="informatique">Informatique</option>
             <option value="actualite">Actualité</option>
             <option value="game">Game</option>
-        </select>
-        <input type="text" id="valfiltre" name="valfiltre" placeholder="Entrez la valeur">
+        </select> <br/>
         <button type="submit">Filtrer</button>
     </form>
 
@@ -27,7 +29,7 @@ require_once "includes/nav.php";
             $conn = new PDO('mysql:host=localhost;dbname=blog', 'root', '');
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            $sql = 'SELECT * FROM articles WHERE 1=1'; // Condition de base pour ajouter des filtres
+            $sql = 'SELECT a.*, u.username FROM articles a JOIN users u ON a.author_id = u.id WHERE 1=1';  // Condition de base pour ajouter des filtres
             $params = [];
 
             // Filtrer par titre
@@ -51,9 +53,10 @@ require_once "includes/nav.php";
 
 
             if (!empty($_POST['filtrerparauteur']) && !empty($_POST['valfiltre'])) {
-                $sql = 'SELECT * FROM articles a JOIN users u ON a.id = u.id WHERE 1=1 and u.username = :auteur';
-                $params[':auteur'] = $_POST['filtrerparauteur'];
+                $sql .= ' AND u.username = :auteur';
+                $params[':auteur'] = $_POST['valfiltre'];
             }
+
             $sql .= ' ORDER BY created_at DESC LIMIT 25';
             $stmt = $conn->prepare($sql);
             $stmt->execute($params);

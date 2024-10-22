@@ -26,6 +26,29 @@ if ($article_row) {
     if (!empty($_POST['action']) && $_POST['action'] == "delete" && is_connected() && (is_admin() || is_article_admin($article_row))) {
         delete_article_database($_GET['id']);
     }
+    // supprime le commentaire quand le bouton est cliqué
+    if (!empty($_POST['action']) && $_POST['action'] == "delete_comment" && !empty($_POST['comment_id']) && is_connected()) {
+        $comment_id = $_POST['comment_id'];
+
+        try {
+            $conn = new PDO('mysql:host=localhost;dbname=blog','root','');
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = 'SELECT * FROM comments where id = ?';
+            $stmt= $conn->prepare($sql);
+            $stmt->execute([ $comment_id ]);
+
+            $comment_row = $stmt->fetch();
+        } catch(PDOException $e) {
+            die("SQL error: ".$e->getMessage());
+        }
+
+        if (!empty($comment_row['author_id']) && $_SESSION["user"]["id"] == $comment_row['author_id'] || is_admin()){
+            delete_message($_POST['comment_id']);
+        } else {
+            // non authorisé a delete
+        }
+    }
+    // ajout d'un commentaire
     if (!empty($_POST['action']) && $_POST['action'] == "new_comment" && !empty($_POST['comment']) && is_connected()) {
         $comment = $_POST['comment'];
         $author_id = $_SESSION['user']['id'];

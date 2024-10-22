@@ -47,6 +47,9 @@ require_once "includes/nav.php";
                 $sql .= ' AND categorie = :categorie ';
                 $params[':categorie'] = $_POST['filtrerparcategorie'];
             }
+
+
+
             if (!empty($_POST['filtrerparauteur']) && !empty($_POST['valfiltre'])) {
                 $sql = 'SELECT * FROM articles a JOIN users u ON a.id = u.id WHERE 1=1 and u.username = :auteur';
                 $params[':auteur'] = $_POST['filtrerparauteur'];

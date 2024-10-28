@@ -6,15 +6,49 @@ html, body {
   height: 100%;
 }
 
+.input_block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.input_block label {
+  font-weight: bold;
+  font-size: larger;
+}
+.input_block input {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background-color: #646464;
+  color: #D9D9D9;
+}
+.input_block input:focus {
+  outline: solid #db935f;
+}
+
 body {
   display: flex;
   flex-direction: column;
-}
-body.home main {
-  flex: 1;
-  display: flex;
   background-color: #2D2D2D;
   color: white;
+}
+body main {
+  flex: 1;
+  display: flex;
+}
+body.login main, body.account main, body.create_article main {
+  justify-content: center;
+  align-items: center;
+}
+body.login main form, body.login main > div, body.account main form, body.account main > div, body.create_article main form, body.create_article main > div {
+  flex: 1;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+body.login main form .error_msg, body.login main > div .error_msg, body.account main form .error_msg, body.account main > div .error_msg, body.create_article main form .error_msg, body.create_article main > div .error_msg {
+  color: #ff4e3f;
 }
 body.home main .filters {
   width: 250px;
@@ -74,12 +108,23 @@ body nav {
   justify-content: space-between;
   align-items: center;
   height: 50px;
-  padding: 10px 20px;
-  border-top: 2px dashed #9f6943;
+  padding: 0 20px;
 }
 body nav a.button {
   background-color: white;
   color: black;
+}
+body nav a.button img {
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
+  object-fit: cover;
+}
+body nav a.button img:first-child {
+  margin-right: 8px;
+}
+body nav a.button img:last-child {
+  margin-left: 8px;
 }
 body header {
   background: #DB935F;
@@ -88,9 +133,10 @@ body header {
   justify-content: center;
   align-items: center;
   min-height: 150px;
+  border-bottom: 2px dashed #9f6943;
 }
 
-a.button, input.button, button.button {
+a.button, input.button, button.button, input[type=submit] {
   border: none;
   margin: 0;
   width: auto;

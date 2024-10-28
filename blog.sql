@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : mar. 22 oct. 2024 à 06:30
+-- Généré le : lun. 28 oct. 2024 à 15:39
 -- Version du serveur : 8.3.0
 -- Version de PHP : 8.2.18
 
@@ -39,9 +39,8 @@ CREATE TABLE IF NOT EXISTS `articles` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `id` (`id`),
   KEY `author_id` (`author_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Déchargement des données de la table `articles`
@@ -55,7 +54,11 @@ INSERT INTO `articles` (`id`, `title`, `content`, `author_id`, `image_url`, `cre
 (49, 'salut le monde', 'titre', 24, 'imgArticle/49.png', '2024-10-18 12:10:49', '2024-10-18 12:10:49'),
 (50, 'offensive', 'offensive', 25, 'imgArticle/50.png', '2024-10-18 12:13:19', '2024-10-18 12:13:19'),
 (52, 'test article', 'jzekljfezlkdsjflksdjflksjdlkfdsf', 26, '', '2024-10-18 13:25:56', '2024-10-18 13:25:56'),
-(53, 'test article', 'jzekljfezlkdsjflksdjflksjdlkfdsf', 26, '', '2024-10-18 13:26:54', '2024-10-18 13:26:54');
+(53, 'test article', 'jzekljfezlkdsjflksdjflksjdlkfdsf', 26, '', '2024-10-18 13:26:54', '2024-10-18 13:26:54'),
+(54, 'Test article', 'ouais', 29, 'imgArticle/671fa030ea8dc.png', '2024-10-28 15:31:13', '2024-10-28 15:31:13'),
+(55, 'Test article', 'ouais', 29, 'imgArticle/671fa0ea13398.png', '2024-10-28 15:34:18', '2024-10-28 15:34:18'),
+(56, 'Test article', 'ouais', 29, 'imgArticle/671fa111e4bb0.png', '2024-10-28 15:34:57', '2024-10-28 15:34:57'),
+(57, 'Test article', 'ouais', 29, 'imgArticle/671fa15e01b08.png', '2024-10-28 15:36:14', '2024-10-28 15:36:14');
 
 -- --------------------------------------------------------
 
@@ -68,9 +71,17 @@ CREATE TABLE IF NOT EXISTS `article_categories` (
   `article_id` int NOT NULL,
   `category_id` int NOT NULL,
   PRIMARY KEY (`article_id`,`category_id`),
-  KEY `article_id` (`article_id`),
-  KEY `category_id` (`category_id`)
+  KEY `article_categories_ibfk_2` (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `article_categories`
+--
+
+INSERT INTO `article_categories` (`article_id`, `category_id`) VALUES
+(52, 2),
+(56, 2),
+(57, 2);
 
 -- --------------------------------------------------------
 
@@ -82,9 +93,16 @@ DROP TABLE IF EXISTS `categories`;
 CREATE TABLE IF NOT EXISTS `categories` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` text NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `id` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `categories`
+--
+
+INSERT INTO `categories` (`id`, `name`) VALUES
+(2, 'Test'),
+(5, 'Informatique');
 
 -- --------------------------------------------------------
 
@@ -101,7 +119,6 @@ CREATE TABLE IF NOT EXISTS `comments` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `id` (`id`),
   KEY `author_id` (`author_id`),
   KEY `article_id` (`article_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -125,35 +142,35 @@ INSERT INTO `comments` (`id`, `author_id`, `content`, `article_id`, `created_at`
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `email` text NOT NULL,
-  `password` text NOT NULL,
-  `username` text NOT NULL,
-  `avatar_url` text NOT NULL,
-  `description` text NOT NULL,
+  `email` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `username` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `password` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `avatar_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `admin` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `id` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Déchargement des données de la table `users`
 --
 
-INSERT INTO `users` (`id`, `email`, `password`, `username`, `avatar_url`, `description`, `admin`) VALUES
-(13, 'admin@localhost.fr', '$2y$10$sy1nRzEWGk5cyG10z5/1vuuVQwmKfiP0RCgGjLZwnrWzKgk0ATp76', 'Admin', 'uploads/13.png', 'Super admin de la mort qui tue', 1),
-(14, 'actwild644@gmail.com', '$2y$10$WitaxwFxR02/bns.wQbmv.I27A6vvm9EusTWcg5GmW9EEDlb4Maoi', 'Je S&#039;appelle Groot', 'uploads/14.png', 'Je suis un arbre', 0),
-(15, 'rejeri4888@givehit.com', '$2y$10$uuMgnZvsAr3lJ1NgoBqGIudUcBvpw/aYXgAbj33thmCyco19skera', 'un chat', 'uploads/15.png', 'miaou', 0),
-(16, 'lebron@localhost', '$2y$10$EZrWhKj5oD6BGWaaWovPZeiYIzO.8bY3ra0I2NJR2pVWPkaywnfDC', 'lebron', 'uploads/16.png', '', 0),
-(17, 'aozfiaeiufnzorngoierngnieroignoeringoierngoneirgoineroignoeirngoinerngoinergioneorigoeirgonerogineoirgoenrgoineroignoeirngoienrgoineroigneorignoeringoierginoerignoenrgoienrgoineorignoeirgn@gmail.com', '$2y$10$3fF5mlG0RG2HKap5w4SFZ.TETpwafaTsX/N6inaCOMU7ynGiLvaVW', 'penguin', 'uploads/17.png', 'il est petit', 0),
-(18, 'test@yoprmail.fr\' or 1=1;--', '$2y$10$XJoNnLQU/zN/m3jfnxD3P.P7oj3ceSn1LxX4zz9CazJX4.5HvBOjy', '', '', '', 0),
-(19, 'Clem3', '$2y$10$5Qv0uuMSWfjGrmRoVYLuXufLz/On1hUc47PIrx5jxINLQCxzUeHsK', '', '', '', 0),
-(20, 'mergez@tutu.com', '$2y$10$MlEjgwgDqlhfSNE9.E4/ougKVw1lkvQ7TQtTG4ye6vfdHsVVGV7z.', 'merguez', 'uploads/20.png', 'J&#039;aime les barbec', 0),
-(21, 'devdocs@douze.fr', '$2y$10$0Zkhj4.ELgr40WC64Nduxu23SgUzriOPusB.tZHSgjPhOea6hUp/a', 'dDs', 'uploads/21.png', '&amp;&eacute;', 0),
-(22, 'a@a.com', '$2y$10$kHIlRQAtXGslATLCpdQntuHrDeE5iORT1AQcMjzTreLCw.bqeVisG', 'qeersztnztrn', 'uploads/22.png', 'oui', 0),
-(23, 'admin@localost.fr', '$2y$10$rr5qucGbJ5t.6sFTULh3ROw1thCneRf5jtPpPkpws3NCr7uSLdt8a', 'Admin', 'uploads/23.png', 'Super admin de la mort qui tue', 1),
-(24, 'in@localhost.fr', '$2y$10$pd/cgSmeqAHeaWKU.Qk0be9767zNnHXo1MJlaoxtdQqb2YTuwmn1e', '', '', '', 0),
-(25, 'b@a.com', '$2y$10$oRwPXg.aEfLpBPyQzB9p9OZ94HQnOLtn.6G3UkMFIihWbJLMIHjR6', 'c mloi', 'uploads/25.png', 'la conaissance', 0),
-(26, 'test@test.test', '$2y$10$Vz2omU3WAru273CUHrlQpOe/roRn34Jak0F6YN4DTSt4.teKqSlOq', 'test', '', '', 0);
+INSERT INTO `users` (`id`, `email`, `username`, `password`, `avatar_url`, `admin`) VALUES
+(13, 'admin@localhost.fr', 'Admin', '$2y$10$sy1nRzEWGk5cyG10z5/1vuuVQwmKfiP0RCgGjLZwnrWzKgk0ATp76', 'uploads/13.png', 1),
+(14, 'actwild644@gmail.com', 'Je S&#039;appelle Groot', '$2y$10$WitaxwFxR02/bns.wQbmv.I27A6vvm9EusTWcg5GmW9EEDlb4Maoi', 'uploads/14.png', 0),
+(15, 'rejeri4888@givehit.com', 'un chat', '$2y$10$uuMgnZvsAr3lJ1NgoBqGIudUcBvpw/aYXgAbj33thmCyco19skera', 'uploads/15.png', 0),
+(16, 'lebron@localhost', 'lebron', '$2y$10$EZrWhKj5oD6BGWaaWovPZeiYIzO.8bY3ra0I2NJR2pVWPkaywnfDC', 'uploads/16.png', 0),
+(17, 'aozfiaeiufnzorngoierngnieroignoeringoierngoneirgoineroignoeirngoinerngoinergioneorigoeirgonerogineoirgoenrgoineroignoeirngoienrgoineroigneorignoeringoierginoerignoenrgoienrgoineorignoeirgn@gmail.com', 'penguin', '$2y$10$3fF5mlG0RG2HKap5w4SFZ.TETpwafaTsX/N6inaCOMU7ynGiLvaVW', 'uploads/17.png', 0),
+(18, 'test@yoprmail.fr\' or 1=1;--', '', '$2y$10$XJoNnLQU/zN/m3jfnxD3P.P7oj3ceSn1LxX4zz9CazJX4.5HvBOjy', '', 0),
+(19, 'Clem3', '', '$2y$10$5Qv0uuMSWfjGrmRoVYLuXufLz/On1hUc47PIrx5jxINLQCxzUeHsK', '', 0),
+(20, 'mergez@tutu.com', 'merguez', '$2y$10$MlEjgwgDqlhfSNE9.E4/ougKVw1lkvQ7TQtTG4ye6vfdHsVVGV7z.', 'uploads/20.png', 0),
+(21, 'devdocs@douze.fr', 'dDs', '$2y$10$0Zkhj4.ELgr40WC64Nduxu23SgUzriOPusB.tZHSgjPhOea6hUp/a', 'uploads/21.png', 0),
+(22, 'a@a.com', 'qeersztnztrn', '$2y$10$kHIlRQAtXGslATLCpdQntuHrDeE5iORT1AQcMjzTreLCw.bqeVisG', 'uploads/22.png', 0),
+(23, 'admin@localost.fr', 'Admin', '$2y$10$rr5qucGbJ5t.6sFTULh3ROw1thCneRf5jtPpPkpws3NCr7uSLdt8a', 'uploads/23.png', 1),
+(24, 'in@localhost.fr', '', '$2y$10$pd/cgSmeqAHeaWKU.Qk0be9767zNnHXo1MJlaoxtdQqb2YTuwmn1e', '', 0),
+(25, 'b@a.com', 'c mloi', '$2y$10$oRwPXg.aEfLpBPyQzB9p9OZ94HQnOLtn.6G3UkMFIihWbJLMIHjR6', 'uploads/25.png', 0),
+(26, 'test@test.test', 'test', '$2y$10$Vz2omU3WAru273CUHrlQpOe/roRn34Jak0F6YN4DTSt4.teKqSlOq', '', 0),
+(28, 'dev@tauten.net', 'Elephant', '$2y$10$K03UgdEoo.aZIRCkgsdmaO2Z6MmyYZtfmCPGZSeOLbQfdxt/LXeZu', 'uploads/671faa5cb7392.png', 0),
+(29, 'dfssad@sdf.t', 'dfssad@sdf.t', '$2y$10$xsmXTqJ2rggWQ0WeXAm8uOZ6UuMjluud8Pg2.Ez7c5V55N1uvOjcG', 'default.png', 0);
 
 --
 -- Contraintes pour les tables déchargées

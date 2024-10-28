@@ -1,15 +1,25 @@
 <?php
 require_once "includes/functions.php";
+
+if (is_connected()) {
+    try {
+        $user = User::findById($_SESSION['user_id'] ?? null);
+        $username = $user->getUsername();
+        $avatar_url = $user->getAvatarUrl();
+    } catch (Exception $e) {
+        $error_msg = $e->getMessage();
+    }
+}
+
 try {
-    $conn = new PDO('mysql:host=localhost;dbname=blog', 'root', '');
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn = get_bdd_connection();
 
     $Select_categorie = 'SELECT * FROM categories';
     $stmtCategory = $conn->prepare($Select_categorie);
     $stmtCategory->execute();
     $ListeCategorie = $stmtCategory->fetchAll();
 
-    $sql = 'SELECT * FROM articles a 
+    $sql = 'SELECT *, a.id as aid FROM articles a 
             JOIN users u ON a.author_id = u.id 
             JOIN article_categories ac ON a.id = ac.article_id 
             JOIN categories c ON ac.category_id = c.id 
@@ -45,13 +55,14 @@ try {
     $stmt->execute($params);
     $values = $stmt->fetchAll();
 
+
 } catch (PDOException $e) {
     echo "Erreur SQL : " . $e->getMessage();
 }
 ?>
 
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -60,56 +71,59 @@ try {
     <link rel="stylesheet" href="res/css/style2.css">
 </head>
 <body class="home">
-<header>
-    <h1>Le blog</h1>
-</header>
-<nav>
-    <div class="left">
-        <a href="./" class="button">Home</a>
-        <a href="create_article.php" class="button">New</a>
-    </div>
-    <div class="right">
-        <a href="login.php" class="button">Login</a>
-    </div>
-</nav>
-<main>
-    <form method="POST" class="filters">
-        <h2>Filtres</h2>
-        <div class="input_block">
-            <label class="input_name" for="auteur">Auteur</label>
-            <input type="text" name="auteur" id="auteur" placeholder="Auteur">
+    <header>
+        <h1>Le blog</h1>
+    </header>
+    <nav>
+        <div class="left">
+            <a href="./" class="button">Accueil</a>
+            <a href="create_article.php" class="button">Nouveau</a>
         </div>
-        <div class="input_block">
-            <label class="input_name" for="categorie">Catégorie</label>
-            <select name="categorie" id="categorie">
-                <option value="">Aucun</option>
-                <?php foreach ($ListeCategorie as $categorie): ?>
-                    <option value="<?= $categorie['id'] ?>"><?= htmlentities($categorie['name']) ?></option>
-                <?php endforeach; ?>
-            </select>
+        <div class="right">
+            <a href="account.php" class="button">
+                <?= $username ?? 'Connexion' ?>
+                <img src="<?= $avatar_url ?? 'res/img/login.png' ?>" alt="<?= $username ?? 'Default' ?>'s avatar">
+            </a>
         </div>
-        <div class="input_block">
-            <label class="input_name" for="titre">Titre</label>
-            <input type="text" name="titre" id="titre" placeholder="Titre">
-        </div>
-        <div class="input_block">
-            <label class="input_name" for="contenu">Contenu</label>
-            <input type="text" name="contenu" id="contenu" placeholder="Contenu">
-        </div>
-        <input class="button" type="submit" value="Filtrer">
-    </form>
-    <div class="articles">
-        <?php foreach ($values as $row): ?>
-            <div class="article">
-                <img src="<?= htmlentities($row['image_url']) ?>">
-                <div class="preview">
-                    <h4><?= htmlentities($row['title']) ?></h4>
-                    <p><?= htmlentities($row['content']) ?></p>
-                    <a href="article.php?id=<?= $row['id'] ?>">Lire Plus</a>
-                </div>
+    </nav>
+    <main>
+        <form method="POST" class="filters">
+            <h2>Filtres</h2>
+            <div class="input_block">
+                <label class="input_name" for="auteur">Auteur</label>
+                <input type="text" name="auteur" id="auteur" placeholder="Auteur">
             </div>
-        <?php endforeach; ?>
-    </div>
-</main>
+            <div class="input_block">
+                <label class="input_name" for="categorie">Catégorie</label>
+                <select name="categorie" id="categorie">
+                    <option value="">Aucun</option>
+                    <?php foreach ($ListeCategorie as $categorie): ?>
+                        <option value="<?= $categorie['id'] ?>"><?= htmlentities($categorie['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="input_block">
+                <label class="input_name" for="titre">Titre</label>
+                <input type="text" name="titre" id="titre" placeholder="Titre">
+            </div>
+            <div class="input_block">
+                <label class="input_name" for="contenu">Contenu</label>
+                <input type="text" name="contenu" id="contenu" placeholder="Contenu">
+            </div>
+            <input class="button" type="submit" value="Filtrer">
+        </form>
+        <div class="articles">
+            <?php foreach ($values as $row): ?>
+                <div class="article">
+                    <img src="<?= htmlentities($row['image_url']) ?>" alt="Image de l'article">
+                    <div class="preview">
+                        <h4><?= htmlentities($row['title']) ?></h4>
+                        <p><?= htmlentities($row['content']) ?></p>
+                        <a href="article.php?id=<?= $row['aid'] ?>">Lire Plus</a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </main>
 </body>
 </html>

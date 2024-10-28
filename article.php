@@ -1,10 +1,10 @@
 <?php
-require_once "includes/headerfunction.php";
+require_once 'includes/functions.php';
 require_once 'includes/article_functions.php';
-require_once "includes/header.php";
 
-var_dump($_REQUEST);
-
+function is_admin() {
+    return $_SESSION['user']['admin'] ?? 0;
+}
 $article_row = null;
 if (!empty($_GET['id'])) {
     $article_id = $_GET['id'];
@@ -44,8 +44,6 @@ if ($article_row) {
 
         if (!empty($comment_row['author_id']) && $_SESSION["user"]["id"] == $comment_row['author_id'] || is_admin()){
             delete_message($_POST['comment_id']);
-        } else {
-            // non authorisé a delete
         }
     }
     // ajout d'un commentaire
@@ -72,7 +70,7 @@ if ($article_row) {
             <h1><?= htmlentities($article_row['title']) ?></h1>
             <p>Published the <?= $article_row['created_at'] ?></p>
             <div class="author_card">
-                <img src="<?= $article_row['avatar_url'] ?>">
+                <img src="<?= $article_row['avatar_url'] ?>" alt="Image de l'article">
                 <div class="text">
                     <span class="author"><?= $article_row['username'] ?></span>
                     <span class="bio">"<?= $article_row['description'] ?>"</span>
@@ -80,8 +78,6 @@ if ($article_row) {
             </div>
         </div>
     </div>
-
-    <?php require_once "includes/nav.php"; ?>
 
     <main class="article">
         <article>
@@ -105,7 +101,10 @@ if ($article_row) {
                 <?php if (is_connected()) { ?>
                     <form action="article.php?id=<?= $_GET['id'] ?>" method="post">
                         <input type="hidden" name="action" value="new_comment">
-                        <input type="text" name="comment" placeholder="Commentaire">
+                        <label>
+                            Commentaire:
+                            <input type="text" name="comment" placeholder="Commentaire">
+                        </label>
                         <input type="submit" value="Envoyer">
                     </form>
                 <?php
@@ -127,7 +126,7 @@ if ($article_row) {
                     ?>
                     <div class="comment">
                         <div class="author_card">
-                            <img src="<?= $row['avatar_url'] ?>">
+                            <img src="<?= $row['avatar_url'] ?>" alt="Image de profil de <?= htmlentities($row['username']) ?>">
                             <span class="username"><?= htmlentities($row['username']) ?></span>
                             <form action="article.php?id=<?= $_GET['id'] ?>" method="post">
                                 <input type="hidden" name="action" value="delete_comment">
@@ -148,8 +147,6 @@ if ($article_row) {
 
 } else {
 
-    require_once "includes/realheader.php";
-    require_once "includes/nav.php";
     ?>
     <main class="error">
         <div class="container">
@@ -158,5 +155,6 @@ if ($article_row) {
     </main>
     <?php
 }
-require_once 'includes/footer.php';
 ?>
+
+

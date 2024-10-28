@@ -1,108 +1,87 @@
 <?php
-require_once "../includes/headerfunction.php";
-require_once "../includes/header.php";
+require_once '../includes/Category.php';
 
-var_dump($_POST);
-function get_categories(){
-    $values = [];
+if (!empty($_POST['action'])) {
     try {
-        $conn = new PDO('mysql:host=localhost;dbname=blog','root','');
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $sql =  'SELECT * FROM categories';
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([]);
-        $values = $stmt->fetchAll();
-        $conn = null;
-    } catch(PDOException $e) {
-        echo "SQL error: ".$e->getMessage();
-    }
-    return $values;
-}
-
-// supprimer une catégorie a la BD
-if (!empty($_POST["categorie_a_suppr"])) {
-    try {
-        $conn = new PDO('mysql:host=localhost;dbname=blog','root','');
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $conn->prepare("DELETE FROM categories where id = ?");
-        $stmt->execute([$_POST["categorie_a_suppr"]]);
-    } catch (PDOException $e) {
-        die('Erreur pdo' . $e->getMessage());
-    } catch (Exception $e) {
-        die('Erreur général' . $e->getMessage());
-    }
-}
-// modifier une categorie
-if (!empty($_POST["ancien_nom"]) && !empty($_POST["nouveau_nom"]) ) {
-    try{
-            $conn = new PDO('mysql:host=localhost;dbname=blog', 'root', '');
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $stmt = $conn->prepare("UPDATE categories SET name = ? WHERE id = ?");
-            $stmt->execute([$_POST["nouveau_nom"], $_POST["ancien_nom"]]);
-        } catch (PDOException $e) {
-            echo('Erreur pdo' . $e->getMessage());
-        } catch (Exception $e) {
-            echo('Erreur général' . $e->getMessage());
+        switch ($_POST['action']) {
+            case 'create':
+                Category::create($_POST['name']);
+                break;
+            case 'update':
+                Category::findById($_POST['id'])->update($_POST['name']);
+                break;
+            case 'delete':
+                Category::findById($_POST['id'])->delete();
+                break;
+            default:
+                throw new Exception('Unexpected action value');
         }
-    }
-
-//rajoute une catégorie a la BD
-if (!empty($_POST["nom"])) {
-    try {
-        $conn = new PDO('mysql:host=localhost;dbname=blog', 'root', '');
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $conn->prepare("INSERT INTO categories (name) VALUES(?)");
-        $stmt->execute([$_POST['nom']]);
-
-    } catch (PDOException $e) {
-        die ('Erreur pdo' . $e->getMessage());
     } catch (Exception $e) {
-        die('Erreur général' . $e->getMessage());
+        die($e->getMessage());
     }
 }
+
+try {
+    $categories = Category::getAll();
+} catch (Exception $e) {
+    die($e->getMessage());
+}
+
 ?>
-<fieldset>
-    <legend>Supprimer une catégorie</legend>
-    <form action="index.php" method="post" class="formclass">
-        <select name="categorie_a_suppr" id="filtrerparcategorie">
-            <?php
-            foreach  (get_categories() as $row) {?>
-                <option value="<?= $row['id'] ?>"><?= $row['name'] ?></option>
-            <?php } ?>
-        </select>
-        <input type="submit" value="Supprimerr">
-    </form>
-</fieldset>
-<fieldset>
-    <legend>Mise a jour d'une catégorie</legend>
-    <form action="index.php" method="post" class="formclass">
-        <select name="ancien_nom" >
-            <?php
-            foreach  (get_categories() as $row) {?>
-                <option value="<?= $row['id'] ?>"><?= $row['name'] ?></option>
-            <?php } ?>
-        </select>
-        <input type="text" name="nouveau_nom" placeholder="Nouveau nom de la catégorie">
-        <input type="submit" value="Mettre a jour">
-    </form>
-</fieldset>
+
 <fieldset>
     <legend>Créer</legend>
-    <form method ='POST' action = 'index.php'>
-        <input type="text" name="nom" placeholder="Nouveau nom de la catégorie">
-        <button type="submit">Créer</button>
-
+    <form action="./" method="post">
+        <input type="hidden" name="action" value="create">
+        <label>
+            Nom:
+            <input type="text" name="name" placeholder="Nouveau nom de la catégorie">
+        </label>
+        <input type="submit" value="Créer">
     </form>
 </fieldset>
+
 <fieldset>
     <legend>Liste des categories</legend>
     <ul>
-    <?php
-
-    foreach  (get_categories() as $row) {?>
-        <li><?= $row['name'] ?></li>
-    <?php } ?>
+        <?php foreach ($categories as $category): ?>
+            <li><?= $category->getName() ?></li>
+        <?php endforeach; ?>
     </ul>
 </fieldset>
 
+<fieldset>
+    <legend>Mise a jour d'une catégorie</legend>
+    <form action="./" method="post">
+        <input type="hidden" name="action" value="update">
+        <label>
+            Catégorie:
+            <select name="id">
+                <?php foreach ($categories as $category): ?>
+                    <option value="<?= $category->getId() ?>"><?= $category->getName() ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+        <label>
+            Nom:
+            <input type="text" name="name" placeholder="Nouveau nom de la catégorie">
+        </label>
+        <input type="submit" value="Mettre a jour">
+    </form>
+</fieldset>
 
+<fieldset>
+    <legend>Supprimer une catégorie</legend>
+    <form action="./" method="post">
+        <input type="hidden" name="action" value="delete">
+        <label>
+            Catégorie:
+            <select name="id">
+                <?php foreach ($categories as $category): ?>
+                    <option value="<?= $category->getId() ?>"><?= $category->getName() ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+        <input type="submit" value="Supprimer">
+    </form>
+</fieldset>

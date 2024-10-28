@@ -6,15 +6,54 @@ html, body {
   margin: 0;
   height: 100%;
 }
+
+.input_block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  label {
+    font-weight: bold;
+    font-size: larger;
+  }
+  input {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background-color: #646464;
+    color: #D9D9D9;
+    &:focus {
+      outline: solid #db935f;
+    }
+  }
+}
+
 body {
   display: flex;
   flex-direction: column;
+  background-color: #2D2D2D;
+  color: white;
+  main {
+    flex: 1;
+    display: flex;
+  }
+  &.login, &.account, &.create_article {
+    main {
+      justify-content: center;
+      align-items: center;
+      form, > div {
+        flex: 1;
+        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        .error_msg {
+          color: #ff4e3f;
+        }
+      }
+    }
+  }
   &.home {
     main {
-      flex: 1;
-      display: flex;
-      background-color: #2D2D2D;
-      color: white;
       .filters {
         width: 250px;
         padding: 5px;
@@ -76,12 +115,25 @@ body {
     justify-content: space-between;
     align-items: center;
     height: 50px;
-    padding: 10px 20px;
-    border-top: 2px dashed #9f6943;
+    padding: 0 20px;
 
     a.button {
       background-color: white;
       color: black;
+      img {
+        &:first-child {
+          margin-right: 8px;
+        }
+
+        &:last-child {
+          margin-left: 8px;
+        }
+
+        height: 30px;
+        width: 30px;
+        border-radius: 100%;
+        object-fit: cover;
+      }
     }
   }
   header {
@@ -91,10 +143,11 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 150px;
+    border-bottom: 2px dashed #9f6943;
   }
 }
 
-a.button, input.button, button.button {
+a.button, input.button, button.button, input[type=submit] {
   //reset button style
   border: none;
   margin: 0;

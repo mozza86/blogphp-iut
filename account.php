@@ -1,73 +1,104 @@
 <?php
-require_once "includes/headerfunction.php";
+require_once "includes/functions.php";
 
-require_once "includes/user_functions.php";
-
-if (empty($_SESSION['user'])) {
+if (!is_connected()) {
     header('Location: login.php');
     die;
 }
+
+try {
+    $user = User::findById($_SESSION['user_id'] ?? null);
+    $username = $user->getUsername();
+    $avatar_url = $user->getAvatarUrl();
+} catch (Exception $e) {
+    $error_msg = $e->getMessage();
+}
+
+if ($user->isDeleted()) {
+    header('Location: login.php');
+    die;
+}
+
+
 if (isset($_POST['logout'])) {
     session_destroy();
     header('Location: login.php');
 }
-if(!empty($_FILES['avatar'])){
-    $upload = 'uploads/';
-    $uploadFile = $upload . $_SESSION['user']['id'] . '.png';
+try {
+    if (!empty($_POST['email'])) {
+        $user->setEmail($_POST['email']);
+    }
+    if (!empty($_POST['password'])) {
+        $user->setPassword($_POST['password']);
+    }
+    if (!empty($_POST['username'])) {
+        $user->setUsername($_POST['username'] ?? $user->getEmail());
+    }
+    if(!empty($_FILES['avatar']) && !empty($_FILES['avatar']['tmp_name'])) {
+        $avatar_url = 'uploads/'.uniqid().'.png';
 
-    if (move_uploaded_file($_FILES['avatar']['tmp_name'], $uploadFile)) {
-        if(update_avatar_url($_SESSION['user']['id'], $uploadFile)) {
-            $_SESSION['user']['avatar_url'] = $uploadFile;
+        if (move_uploaded_file($_FILES['avatar']['tmp_name'], $avatar_url)) {
+            $user->setAvatarUrl($avatar_url);
+        } else {
+            echo ('Error uploading avatar');
         }
     }
+} catch (Exception $e) {
+    $error_msg = $e->getMessage();
 }
 
-if (!empty($_POST['username'])) {
-    $username = htmlentities($_POST['username']);
-    if (update_username($_SESSION['user']['id'], $username) ) {
-        $_SESSION['user']['username'] = $username;
-    } else {
-        $_SESSION['user']['username'] = $_SESSION['user']['email'];
-    }
-}
-if (!empty($_POST['description'])) {
-    $description = htmlentities($_POST['description']);
-    if (update_description($_SESSION['user']['id'], $description)) {
-        $_SESSION['user']['description'] = $description;
-    }
-}
-
-require_once "includes/header.php";
 ?>
 
-<div class="container">
-    <div class="home">
-        <img src="<?= $_SESSION['user']['avatar_url'] ?>">
-        <h1><?= $_SESSION['user']['username'] ?></h1>
-        <p><?= $_SESSION['user']['description'] ?></p>
-    </div>
-</div>
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Blog - Compte</title>
+    <link rel="stylesheet" href="res/css/style2.css">
+</head>
+<body class="account">
+    <nav>
+        <div class="left">
+            <a href="./" class="button">Accueil</a>
+            <a href="create_article.php" class="button">Nouveau</a>
+        </div>
+        <div class="right">
+            <a href="account.php" class="button">
+                <?= $username ?? 'Connexion' ?>
+                <img src="<?= $avatar_url ?? 'res/img/login.png' ?>" alt="<?= $username ?? 'Default' ?>'s avatar">
+            </a>
+        </div>
+    </nav>
+    <main>
+        <div>
+            <form method="post" action="account.php" enctype="multipart/form-data">
+                <div class="input_block">
+                    <label for="username">Nom d'utilisateur</label>
+                    <input type="text" name="username" id="username" placeholder="Nom d'utilisateur" value="<?= $user->getUsername() ?>">
+                </div>
+                <div class="input_block">
+                    <label for="avatar">Photo de profil</label>
+                    <input type="file" name="avatar" id="avatar" placeholder="Photo de profil" accept="image/*">
+                </div>
+                <div class="input_block">
+                    <label for="email">Email</label>
+                    <input type="text" name="email" id="email" placeholder="Email" value="<?= $user->getEmail() ?>">
+                </div>
+                <div class="input_block">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" name="password" id="password" placeholder="Mot de passe">
+                </div>
 
-<?php require_once "includes/nav.php"; ?>
+                <input type="submit" value="Mettre a jour">
+            </form>
+            <form method="post" action="account.php">
+                <input type="submit" name="logout" value="Se deconnecter" >
+            </form>
+            <p class="error_msg"><?= $error_msg ?? '' ?></p>
+        </div>
 
-<main>
-    <div class="container">
-        <form method="post" action="account.php" enctype="multipart/form-data">
-            <label> Username :</label>
-            <input type="text" name="username" id="username"> <br/>
-
-            <label> Avatar :</label>
-            <input type="file" name="avatar" id="avatar" accept="image/*"> <br/>
-
-            <label> Description</label>
-            <input type="text" name="description" id="description"> <br/>
-
-            <input type="submit">
-        </form>
-        <form method="post" action="">
-            <input type="submit" value="logout" name="logout">
-        </form>
-
-    </div>
-</main>
-<?php require_once "includes/footer.php";
+    </main>
+</body>
+</html>

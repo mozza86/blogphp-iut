@@ -116,12 +116,13 @@ class User {
             throw new Exception("Invalid email");
         }
         try {
-            $user = User::findByEmail($email);
-
-            if (!$user) {
+            try {
+                $user = User::findByEmail($email);
+                if (!$user->verifyPassword($password)) {
+                    throw new Exception("Wrong password");
+                }
+            } catch (Exception $e) {
                 return User::create($email, $password);
-            } elseif (!$user->verifyPassword($password)) {
-                throw new Exception("Wrong password");
             }
 
             return $user;

@@ -1,5 +1,25 @@
 <?php
 require_once '../includes/Category.php';
+require_once '../includes/User.php';
+require_once '../includes/functions.php';
+
+if (!is_connected()) {
+    header('Location: ../login.php');
+    die;
+}
+try {
+    $user = User::findById($_SESSION['user_id'] ?? null);
+} catch (Exception $e) {
+    $error_msg = $e->getMessage();
+}
+if (!$user->isAdmin()) {
+    header('Location: ../login.php');
+    die;
+}
+if ($user->isDeleted()) {
+    header('Location: ../login.php');
+    die;
+}
 
 if (!empty($_POST['action'])) {
     try {
@@ -31,7 +51,7 @@ try {
 
 <fieldset>
     <legend>Créer</legend>
-    <form action="./" method="post">
+    <form action="" method="post">
         <input type="hidden" name="action" value="create">
         <label>
             Nom:
@@ -52,7 +72,7 @@ try {
 
 <fieldset>
     <legend>Mise a jour d'une catégorie</legend>
-    <form action="./" method="post">
+    <form action="" method="post">
         <input type="hidden" name="action" value="update">
         <label>
             Catégorie:
@@ -72,7 +92,7 @@ try {
 
 <fieldset>
     <legend>Supprimer une catégorie</legend>
-    <form action="./" method="post">
+    <form action="" method="post">
         <input type="hidden" name="action" value="delete">
         <label>
             Catégorie:

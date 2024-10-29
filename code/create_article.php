@@ -62,7 +62,7 @@ try {
 <body class="account">
 <nav>
     <div class="left">
-        <a href="./" class="button">Accueil</a>
+        <a href=".." class="button">Accueil</a>
         <a href="create_article.php" class="button">Nouveau</a>
     </div>
     <div class="right">

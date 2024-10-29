@@ -84,7 +84,7 @@ class Article {
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare("INSERT INTO articles (title, content, author_id, image_url) VALUES (?,?,?,?)");
-            $stmt->execute([$title, $content, $author->id, $image_url]);
+            $stmt->execute([$title, $content, $author->getId(), $image_url]);
 
             $article = new Article($conn->lastInsertId(), $title, $content, $author, $image_url, date("Y-m-d H:i:s"), date("Y-m-d H:i:s"));
 

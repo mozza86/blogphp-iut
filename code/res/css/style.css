@@ -1,125 +1,141 @@
 @import url("https://rsms.me/inter/inter.css");
-html > body {
+html, body {
   font-family: "Inter", sans-serif;
   font-size: 15px;
   margin: 0;
+  height: 100%;
 }
-@supports (font-variation-settings: normal) {
-  html > body {
-    font-family: "Inter var", sans-serif;
-  }
-}
-@media (prefers-color-scheme: dark) {
-  html > body {
-    background-color: #222;
-    color: white;
-  }
-}
-html > body header, html > body nav {
-  background-color: #ffac71;
+
+body {
+  display: flex;
+  flex-direction: column;
+  background-color: #2D2D2D;
   color: white;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
 }
-@media (prefers-color-scheme: dark) {
-  html > body header, html > body nav {
-    background-color: #db935f;
-  }
-}
-html > body header img, html > body nav img {
-  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.2));
-}
-html > body header > .container {
-  padding: 24px;
-}
-html > body header > .container > img {
-  height: 196px;
-}
-@media (max-width: 721px) {
-  html > body header > .container {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    text-align: center;
-  }
-}
-@media (min-width: 720px) {
-  html > body header > .container {
-    display: flex;
-  }
-  html > body header > .container > img {
-    margin-right: 32px;
-  }
-}
-html > body header > .container h1 {
-  font-size: 64px;
-  letter-spacing: -4px;
-  margin: 16px 0;
-}
-html > body header > .container .article_details {
+
+nav {
+  background: #DB935F;
   display: flex;
-  flex-direction: column;
   justify-content: space-between;
+  align-items: center;
+  padding: 4px 20px;
 }
-html > body header > .container .article_details h1 {
-  font-size: 54px;
-  margin: 0;
+nav .left {
+  overflow: hidden;
+  display: inline-block;
+  white-space: nowrap;
 }
-html > body header > .container .article_details p {
-  margin: 0;
+nav a.button {
+  background-color: white;
+  color: black;
 }
-html > body header > .container .article_details .author_card {
+nav a.button img {
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
+  object-fit: cover;
+}
+nav a.button img:first-child {
+  margin-right: 8px;
+}
+nav a.button img:last-child {
+  margin-left: 8px;
+}
+@media (max-width: 470px) {
+  nav a.button:has(img) {
+    overflow: hidden;
+    text-indent: -1000em;
+  }
+  nav a.button:has(img) img:first-child, nav a.button:has(img) img:last-child {
+    margin: 0;
+  }
+}
+
+header {
+  background: #DB935F;
+  color: white;
   display: flex;
-}
-html > body header > .container .article_details .author_card img {
-  height: 60px;
-  width: 60px;
-  margin-right: 12px;
-}
-html > body header > .container .article_details .author_card .text {
-  display: flex;
-  flex-direction: column;
   justify-content: center;
+  align-items: center;
+  min-height: 150px;
+  border-bottom: 2px dashed #9f6943;
 }
-html > body nav {
-  border-top: dashed 2px rgba(255, 255, 255, 0.16);
-}
-html > body nav > .container {
-  padding: 0 16px;
-  justify-content: space-between;
-}
-html > body nav > .container, html > body nav > .container div {
+
+main {
+  flex: 1;
   display: flex;
+  padding: 0 20px;
 }
-html > body nav > .container > div > a {
-  height: 40px;
-  font-weight: 600;
-  padding: 0 8px;
-  display: flex;
+main.login, main.account, main.create_article, main.admin {
+  justify-content: center;
   align-items: center;
 }
-html > body nav > .container > div > a:not(:hover) {
-  text-decoration: none;
+main.login form, main.login > div, main.account form, main.account > div, main.create_article form, main.create_article > div, main.admin form, main.admin > div {
+  flex: 1;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
-@media (hover: hover) {
-  html > body nav > .container > div > a:hover {
-    color: #ffac71;
-    background: white;
-    text-shadow: none;
+main.login form .error_msg, main.login > div .error_msg, main.account form .error_msg, main.account > div .error_msg, main.create_article form .error_msg, main.create_article > div .error_msg, main.admin form .error_msg, main.admin > div .error_msg {
+  color: #ff4e3f;
+}
+main.home {
+  padding: 0;
+}
+main.home .filters {
+  width: 280px;
+  padding: 5px;
+}
+main.home .filters .toggle_filters {
+  display: none;
+}
+main.home .filters label {
+  display: flex;
+  padding: 8px 12px;
+}
+main.home .filters label > * {
+  flex: 10;
+  width: 100%;
+}
+main.home .filters label span {
+  flex: 6;
+}
+main.home .filters label input {
+  box-sizing: border-box;
+}
+main.home .filters input[type=submit] {
+  width: calc(100% - 24px);
+  margin: 12px;
+  box-sizing: border-box;
+}
+main.home .articles {
+  flex: 1;
+}
+main.home .articles article {
+  flex: 1;
+  display: flex;
+  gap: 15px;
+  padding: 10px 50px;
+  background-color: #2D2D2D;
+  border-radius: 5px;
+}
+main.home .articles article:nth-child(2n-1) {
+  background-color: #292929;
+}
+@media (max-width: 470px) {
+  main.home .articles article {
+    padding: 10px 17px;
   }
 }
-html > body main.home article:nth-child(2n-1) {
-  background-color: rgba(128, 128, 128, 0.05);
-}
-html > body main.home article .container {
-  padding: 24px;
-  display: flex;
-}
-@media (max-width: 560px) {
-  html > body main.home article .container {
+@media (max-width: 1000px) {
+  main.home .articles article {
     flex-direction: column;
   }
 }
-html > body main.home article .container img {
+main.home .articles article img {
+  min-width: 160px;
+  min-height: 90px;
   width: 200px;
   height: 150px;
   object-fit: cover;
@@ -127,71 +143,94 @@ html > body main.home article .container img {
   border-radius: 6px;
   border: solid rgba(128, 128, 128, 0.4) 2px;
 }
-@media (max-width: 560px) {
-  html > body main.home article .container img {
+@media (max-width: 1000px) {
+  main.home .articles article img {
     width: 100%;
   }
 }
-html > body main.article img {
-  max-width: 100%;
-  height: 196px;
-}
-html > body main .comment .author_card {
+main.home .articles article .preview {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: space-evenly;
 }
-html > body main .comment .author_card img {
-  height: 35px;
-  width: 35px;
-}
-html > body .container {
-  margin: auto;
-  box-sizing: border-box;
-  max-width: 1000px;
-}
-html, html body {
-  height: 100%;
+@media (max-width: 470px) {
+  main.home {
+    flex-direction: column;
+  }
+  main.home .filters:has(.toggle_filters:not(:checked)) > h2 > label:before {
+    content: "Afficher";
+  }
+  main.home .filters:has(.toggle_filters:not(:checked)) > label, main.home .filters:has(.toggle_filters:not(:checked)) > input {
+    display: none;
+  }
+  main.home .filters {
+    width: calc(100% - 10px);
+  }
+  main.home .filters > h2 > label:before {
+    content: "Masquer";
+  }
+  main.home .filters label:has(.toggle_filters) {
+    display: flex;
+    flex-direction: row;
+  }
 }
 
-p {
-  line-height: 1.5;
+a.button, input.button, button.button, input[type=submit] {
+  border: none;
+  margin: 0;
+  width: auto;
+  overflow: visible;
+  /* inherit font & color from ancestor */
+  font: inherit;
+  /* Normalize `line-height`. Cannot be changed from `normal` in Firefox 4+. */
+  line-height: normal;
+  /* Corrects font smoothing for webkit */
+  -webkit-font-smoothing: inherit;
+  -moz-osx-font-smoothing: inherit;
+  /* Corrects inability to style clickable `input` types in iOS */
+  -webkit-appearance: none;
+  border-radius: 100px;
+  background-color: #db935f;
+  padding: 6px 10px;
+  text-decoration: none;
+  color: white;
 }
 
 a {
-  color: inherit;
-}
-@media (hover: none) {
-  a {
-    cursor: none;
-  }
-}
-a.more {
   color: #db935f;
-  font-weight: 600;
-  text-decoration: none;
 }
-a.more::before {
-  content: "-->";
-  transition: 0.2s;
-  margin-left: -20px;
-  opacity: 0;
+a.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-a.more:hover::before {
-  margin-left: 0px;
-  margin-right: 4px;
-  opacity: 1;
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
 }
-a.account img {
-  height: 30px;
-  width: 30px;
-  border-radius: 100%;
-  object-fit: cover;
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
-a.account img:first-child {
-  margin-right: 8px;
+label span {
+  font-weight: bold;
+  font-size: larger;
 }
-a.account img:last-child {
-  margin-left: 8px;
+label input, label textarea, label select {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background-color: #646464;
+  color: #D9D9D9;
+}
+label input:focus, label textarea:focus, label select:focus {
+  outline: solid #db935f;
+}
+
+fieldset {
+  border-radius: 10px;
 }
 
 /*# sourceMappingURL=style.css.map */

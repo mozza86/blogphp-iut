@@ -61,68 +61,58 @@ try {
     echo "Erreur Category::getAll() : " . $e->getMessage();
 }
 ?>
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Blog</title>
-    <link rel="stylesheet" href="res/css/style2.css">
+    <link rel="stylesheet" href="res/css/style.css">
 </head>
-<body class="home">
+<body>
     <header>
         <h1>Le blog</h1>
     </header>
-    <nav>
-        <div class="left">
-            <a href=".." class="button">Accueil</a>
-            <a href="create_article.php" class="button">Nouveau</a>
-        </div>
-        <div class="right">
-            <a href="account.php" class="button">
-                <?= $username ?? 'Connexion' ?>
-                <img src="<?= $avatar_url ?? 'res/img/login.png' ?>" alt="<?= $username ?? 'Default' ?>'s avatar">
-            </a>
-        </div>
-    </nav>
-    <main>
+    <?php require_once "includes/header.php"; ?>
+    <main class="home">
         <form method="POST" class="filters">
-            <h2>Filtres</h2>
-            <div class="input_block">
-                <label class="input_name" for="auteur">Auteur</label>
-                <input type="text" name="auteur" id="auteur" placeholder="Auteur">
-            </div>
-            <div class="input_block">
-                <label class="input_name" for="categorie">Catégorie</label>
-                <select name="categorie" id="categorie">
-                    <option value="">Aucun</option>
+            <h2><label>Filtres<input type="checkbox" class="toggle_filters"></label></h2>
+
+            <label>
+                <span>Auteur</span>
+                <input type="text" name="auteur" placeholder="Auteur">
+            </label>
+            <label>
+                <span>Catégorie</span>
+                <select name="categorie">
+                    <option value="">Toutes</option>
                     <?php foreach ($categories as $category): ?>
                         <option value="<?= $category->getId() ?>"><?= htmlentities($category->getName()) ?></option>
                     <?php endforeach; ?>
                 </select>
-            </div>
-            <div class="input_block">
-                <label class="input_name" for="titre">Titre</label>
-                <input type="text" name="titre" id="titre" placeholder="Titre">
-            </div>
-            <div class="input_block">
-                <label class="input_name" for="contenu">Contenu</label>
-                <input type="text" name="contenu" id="contenu" placeholder="Contenu">
-            </div>
-            <input class="button" type="submit" value="Filtrer">
+            </label>
+            <label>
+                <span>Titre</span>
+                <input type="text" name="titre" placeholder="Titre">
+            </label>
+            <label>
+                <span>Contenu</span>
+                <input type="text" name="contenu" placeholder="Contenu">
+            </label>
+
+            <input type="submit" value="Filtrer">
         </form>
         <div class="articles">
             <?php foreach ($values as $row): ?>
-                <div class="article">
+                <article>
                     <img src="<?= htmlentities($row['image_url']) ?>" alt="Image de l'article">
                     <div class="preview">
                         <h4><?= htmlentities($row['title']) ?></h4>
                         <p><?= htmlentities($row['content']) ?></p>
                         <a href="article.php?id=<?= $row['article_id'] ?>">Lire Plus</a>
                     </div>
-                </div>
+                </article>
             <?php endforeach; ?>
         </div>
     </main>

@@ -26,40 +26,29 @@ if (!empty($_POST["email"]) && !empty($_POST["password"])) {
 }
 
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Blog - Connexion</title>
-    <link rel="stylesheet" href="res/css/style2.css">
+    <link rel="stylesheet" href="res/css/style.css">
 </head>
-<body class="login">
-    <nav>
-        <div class="left">
-            <a href=".." class="button">Accueil</a>
-            <a href="create_article.php" class="button">Nouveau</a>
-        </div>
-        <div class="right">
-            <a href="account.php" class="button">
-                <?= $username ?? 'Connexion' ?>
-                <img src="<?= $avatar_url ?? 'res/img/login.png' ?>" alt="<?= $username ?? 'Default' ?>'s avatar">
-            </a>
-        </div>
-    </nav>
-    <main>
+<body>
+    <?php require_once "includes/header.php"; ?>
+    <main class="login">
         <form action="login.php" method="post">
-            <div class="input_block">
-                <label for="email">Email</label>
-                <input type="text" name="email" id="email" placeholder="Email" value="<?= $_POST["email"] ?? '' ?>">
-            </div>
-            <div class="input_block">
-                <label for="password">Mot de passe</label>
-                <input type="password" name="password" id="password" placeholder="Mot de passe" value="<?= $_POST["password"] ?? '' ?>">
-            </div>
+            <label>
+                <span>Email</span>
+                <input type="text" name="email" placeholder="Email" value="<?= $_POST["email"] ?? '' ?>">
+            </label>
+            <label>
+                <span>Mot de passe</span>
+                <input type="password" name="password" placeholder="Mot de passe" value="<?= $_POST["password"] ?? '' ?>">
+            </label>
             <input type="submit" value="Valider">
-            <?php if (isset($user)): ?> <p><a href="account.php">You are already connected as <?= $username ?></a></p>  <?php endif; ?>
+            <?php if (isset($user)): ?> <p><a href="account.php">Vous êtes déjà connecté en tant que  <?= $username ?></a></p>  <?php endif; ?>
             <p class="error_msg"><?= $error_msg ?? '' ?></p>
         </form>
     </main>

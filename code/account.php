@@ -44,48 +44,36 @@ try {
 }
 
 ?>
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Blog - Compte</title>
-    <link rel="stylesheet" href="res/css/style2.css">
+    <title>Blog - Mon compte</title>
+    <link rel="stylesheet" href="res/css/style.css">
 </head>
-<body class="account">
-    <nav>
-        <div class="left">
-            <a href=".." class="button">Accueil</a>
-            <a href="create_article.php" class="button">Nouveau</a>
-        </div>
-        <div class="right">
-            <a href="account.php" class="button">
-                <?= $username ?? 'Connexion' ?>
-                <img src="<?= $avatar_url ?? 'res/img/login.png' ?>" alt="<?= $username ?? 'Default' ?>'s avatar">
-            </a>
-        </div>
-    </nav>
-    <main>
+<body>
+<?php require_once "includes/header.php"; ?>
+    <main class="account">
         <div>
             <form method="post" action="account.php" enctype="multipart/form-data">
-                <div class="input_block">
-                    <label for="username">Nom d'utilisateur</label>
-                    <input type="text" name="username" id="username" placeholder="Nom d'utilisateur" value="<?= $username ?>">
-                </div>
-                <div class="input_block">
-                    <label for="avatar">Photo de profil</label>
-                    <input type="file" name="avatar" id="avatar" placeholder="Photo de profil" accept="image/*">
-                </div>
-                <div class="input_block">
-                    <label for="email">Email</label>
-                    <input type="text" name="email" id="email" placeholder="Email" value="<?= $email ?>">
-                </div>
-                <div class="input_block">
-                    <label for="password">Mot de passe</label>
-                    <input type="password" name="password" id="password" placeholder="Mot de passe">
-                </div>
+                <label>
+                    <span>Nom d'utilisateur</span>
+                    <input type="text" name="username" placeholder="Nom d'utilisateur" value="<?= $username ?>">
+                </label>
+                <label>
+                    <span>Photo de profil</span>
+                    <input type="file" name="avatar" placeholder="Photo de profil" accept="image/*">
+                </label>
+                <label>
+                    <span>Email</span>
+                    <input type="text" name="email" placeholder="Email" value="<?= $email ?>">
+                </label>
+                <label>
+                    <span>Mot de passe</span>
+                    <input type="password" name="password" placeholder="Mot de passe">
+                </label>
 
                 <input type="submit" value="Mettre a jour">
             </form>
@@ -94,7 +82,6 @@ try {
             </form>
             <p class="error_msg"><?= $error_msg ?? '' ?></p>
         </div>
-
     </main>
 </body>
 </html>

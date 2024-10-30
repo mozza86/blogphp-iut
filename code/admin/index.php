@@ -3,6 +3,8 @@ require_once '../includes/Category.php';
 require_once '../includes/User.php';
 require_once '../includes/functions.php';
 
+$__PAGE_PREFIX = '../';
+
 if (!is_connected()) {
     header('Location: ../login.php?err=NotConnected');
     die;
@@ -48,60 +50,79 @@ try {
 }
 
 ?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Blog - Espace Admin</title>
+    <link rel="stylesheet" href="../res/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Espace Admin</h1>
+    </header>
+    <?php require_once "../includes/header.php"; ?>
+    <main class="admin">
+        <div>
+            <fieldset>
+                <legend>Créer</legend>
+                <form action="" method="post">
+                    <input type="hidden" name="action" value="create">
+                    <label>
+                        Nom:
+                        <input type="text" name="name" placeholder="Nouveau nom de la catégorie">
+                    </label>
+                    <input type="submit" value="Créer">
+                </form>
+            </fieldset>
 
-<fieldset>
-    <legend>Créer</legend>
-    <form action="" method="post">
-        <input type="hidden" name="action" value="create">
-        <label>
-            Nom:
-            <input type="text" name="name" placeholder="Nouveau nom de la catégorie">
-        </label>
-        <input type="submit" value="Créer">
-    </form>
-</fieldset>
+            <fieldset>
+                <legend>Liste des catégories</legend>
+                <ul>
+                    <?php foreach ($categories as $category): ?>
+                        <li><?= $category->getName() ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </fieldset>
 
-<fieldset>
-    <legend>Liste des categories</legend>
-    <ul>
-        <?php foreach ($categories as $category): ?>
-            <li><?= $category->getName() ?></li>
-        <?php endforeach; ?>
-    </ul>
-</fieldset>
+            <fieldset>
+                <legend>Mise à jour d'une catégorie</legend>
+                <form action="" method="post">
+                    <input type="hidden" name="action" value="update">
+                    <label>
+                        Catégorie:
+                        <select name="id">
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= $category->getId() ?>"><?= $category->getName() ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+                    <label>
+                        Nom:
+                        <input type="text" name="name" placeholder="Nouveau nom de la catégorie">
+                    </label>
+                    <input type="submit" value="Mettre à jour">
+                </form>
+            </fieldset>
 
-<fieldset>
-    <legend>Mise a jour d'une catégorie</legend>
-    <form action="" method="post">
-        <input type="hidden" name="action" value="update">
-        <label>
-            Catégorie:
-            <select name="id">
-                <?php foreach ($categories as $category): ?>
-                    <option value="<?= $category->getId() ?>"><?= $category->getName() ?></option>
-                <?php endforeach; ?>
-            </select>
-        </label>
-        <label>
-            Nom:
-            <input type="text" name="name" placeholder="Nouveau nom de la catégorie">
-        </label>
-        <input type="submit" value="Mettre a jour">
-    </form>
-</fieldset>
-
-<fieldset>
-    <legend>Supprimer une catégorie</legend>
-    <form action="" method="post">
-        <input type="hidden" name="action" value="delete">
-        <label>
-            Catégorie:
-            <select name="id">
-                <?php foreach ($categories as $category): ?>
-                    <option value="<?= $category->getId() ?>"><?= $category->getName() ?></option>
-                <?php endforeach; ?>
-            </select>
-        </label>
-        <input type="submit" value="Supprimer">
-    </form>
-</fieldset>
+            <fieldset>
+                <legend>Supprimer une catégorie</legend>
+                <form action="" method="post">
+                    <input type="hidden" name="action" value="delete">
+                    <label>
+                        Catégorie:
+                        <select name="id">
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= $category->getId() ?>"><?= $category->getName() ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+                    <input type="submit" value="Supprimer">
+                </form>
+            </fieldset>
+        </div>
+    </main>
+</body>
+</html>

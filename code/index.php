@@ -1,25 +1,19 @@
 <?php
 require_once "includes/functions.php";
+require_once "includes/Category.php";
 
 if (is_connected()) {
     try {
         $user = User::findById($_SESSION['user_id'] ?? null);
         $username = $user->getUsername();
         $avatar_url = $user->getAvatarUrl();
-    } catch (Exception $e) {
+    } catch (ObjectNotFoundException|ObjectDeletedException|SQLException $e) {
         $error_msg = $e->getMessage();
     }
 }
 
 try {
-    $conn = get_bdd_connection();
-
-    $Select_categorie = 'SELECT * FROM categories';
-    $stmtCategory = $conn->prepare($Select_categorie);
-    $stmtCategory->execute();
-    $ListeCategorie = $stmtCategory->fetchAll();
-
-    $sql = 'SELECT *, a.id as aid FROM articles a 
+    $sql = 'SELECT *, a.id as article_id FROM articles a 
             JOIN users u ON a.author_id = u.id 
             JOIN article_categories ac ON a.id = ac.article_id 
             JOIN categories c ON ac.category_id = c.id 
@@ -51,13 +45,20 @@ try {
     }
 
     $sql .= ' ORDER BY a.created_at DESC LIMIT 25';
+
+    $conn = get_bdd_connection();
     $stmt = $conn->prepare($sql);
     $stmt->execute($params);
     $values = $stmt->fetchAll();
 
-
 } catch (PDOException $e) {
     echo "Erreur SQL : " . $e->getMessage();
+}
+
+try {
+    $categories = Category::getAll();
+} catch (SQLException $e) {
+    echo "Erreur Category::getAll() : " . $e->getMessage();
 }
 ?>
 
@@ -97,8 +98,8 @@ try {
                 <label class="input_name" for="categorie">Catégorie</label>
                 <select name="categorie" id="categorie">
                     <option value="">Aucun</option>
-                    <?php foreach ($ListeCategorie as $categorie): ?>
-                        <option value="<?= $categorie['id'] ?>"><?= htmlentities($categorie['name']) ?></option>
+                    <?php foreach ($categories as $category): ?>
+                        <option value="<?= $category->getId() ?>"><?= htmlentities($category->getName()) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -119,7 +120,7 @@ try {
                     <div class="preview">
                         <h4><?= htmlentities($row['title']) ?></h4>
                         <p><?= htmlentities($row['content']) ?></p>
-                        <a href="article.php?id=<?= $row['aid'] ?>">Lire Plus</a>
+                        <a href="article.php?id=<?= $row['article_id'] ?>">Lire Plus</a>
                     </div>
                 </div>
             <?php endforeach; ?>

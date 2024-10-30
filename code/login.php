@@ -5,11 +5,10 @@ if (is_connected()) {
         $user = User::findById($_SESSION['user_id'] ?? null);
         $username = $user->getUsername();
         $avatar_url = $user->getAvatarUrl();
-    } catch (Exception $e) {
-        $error_msg = $e->getMessage();
+    } catch (ObjectNotFoundException|ObjectDeletedException|SQLException $e) {
+        die($e->getMessage());
     }
 }
-
 
 if (!empty($_POST["email"]) && !empty($_POST["password"])) {
     $email = $_POST["email"];
@@ -20,7 +19,7 @@ if (!empty($_POST["email"]) && !empty($_POST["password"])) {
         $_SESSION["user_id"] = $user->getId();
         header('Location: account.php');
         die;
-    } catch (Exception $e) {
+    } catch (ObjectDeletedException|InvalidEmailException|SQLException $e) {
         $error_msg = $e->getMessage();
     }
 }
@@ -58,6 +57,7 @@ if (!empty($_POST["email"]) && !empty($_POST["password"])) {
                 <input type="password" name="password" id="password" placeholder="Mot de passe" value="<?= $_POST["password"] ?? '' ?>">
             </div>
             <input type="submit" value="Valider">
+            <?php if (isset($user)): ?> <p><a href="account.php">You are already connected as <?= $username ?></a></p>  <?php endif; ?>
             <p class="error_msg"><?= $error_msg ?? '' ?></p>
         </form>
     </main>

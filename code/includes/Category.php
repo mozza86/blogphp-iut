@@ -12,40 +12,41 @@ class Category {
     }
 
     public function getId(): int {
-        if ($this->is_deleted) throw new Exception('Category is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Category is deleted');
         return $this->id;
     }
 
     public function getName(): string {
-        if ($this->is_deleted) throw new Exception('Category is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Category is deleted');
         return htmlentities($this->name);
     }
 
     public function getRawName(): string {
-        if ($this->is_deleted) throw new Exception('Category is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Category is deleted');
         return $this->name;
     }
 
     public function delete(): void {
-        if ($this->is_deleted) throw new Exception('Category is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Category is deleted');
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare("DELETE FROM categories WHERE id = ?");
             $stmt->execute([$this->id]);
+            $this->is_deleted = true;
         } catch (PDOException $e) {
-            throw new Exception("PDOException: ".$e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 
     public function update($name): void {
-        if ($this->is_deleted) throw new Exception('Category is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Category is deleted');
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare("UPDATE categories SET name = ? WHERE id = ?");
             $stmt->execute([$name, $this->id]);
             $this->name = $name;
         } catch (PDOException $e) {
-            throw new Exception("PDOException: ".$e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 
@@ -57,7 +58,7 @@ class Category {
 
             return new Category($conn->lastInsertId(), $name);
         } catch (PDOException $e) {
-            throw new Exception("PDOException: ".$e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 
@@ -74,7 +75,7 @@ class Category {
             }
             return $categories_obj;
         } catch(PDOException $e) {
-            throw new Exception("PDOException: " . $e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 
@@ -89,9 +90,9 @@ class Category {
                 return new Category($category['id'], $category['name']);
             }
 
-            throw new Exception("Category does not exist");
+            throw new ObjectNotFoundException("Category does not exist");
         } catch (PDOException $e) {
-            throw new Exception("PDOException: " . $e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 
@@ -106,9 +107,9 @@ class Category {
                 return new Category($category['id'], $category['name']);
             }
 
-            throw new Exception("Category does not exist");
+            throw new ObjectNotFoundException("Category does not exist");
         } catch (PDOException $e) {
-            throw new Exception("PDOException: " . $e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 }

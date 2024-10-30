@@ -4,22 +4,18 @@ require_once 'includes/Category.php';
 require_once "includes/functions.php";
 
 if (!is_connected()) {
-    header('Location: login.php');
+    header('Location: login.php?err=NotConnected');
     die;
 }
 
 try {
     $user = User::findById($_SESSION['user_id'] ?? null);
-    $username = $user->getUsername();
-    $avatar_url = $user->getAvatarUrl();
-} catch (Exception $e) {
-    $error_msg = $e->getMessage();
+    $username = htmlentities($user->getUsername());
+    $avatar_url = htmlentities($user->getAvatarUrl());
+} catch (ObjectDeletedException|SQLException|ObjectNotFoundException $e) {
+    die($e->getMessage());
 }
 
-if ($user->isDeleted()) {
-    header('Location: login.php');
-    die;
-}
 
 if (!empty($_POST["title"]) && !empty($_POST["category"]) && !empty($_FILES['image']) && !empty($_POST["content"])) {
     $title = $_POST["title"];
@@ -35,7 +31,7 @@ if (!empty($_POST["title"]) && !empty($_POST["category"]) && !empty($_FILES['ima
         try {
             $article = Article::create($title, $content, User::findById($_SESSION['user_id']), $image_url, Category::findById($category_id));
             header('Location: article.php?id='.$article->getId());
-        } catch (Exception $e) {
+        } catch (ObjectDeletedException|SQLException|ObjectNotFoundException $e) {
             $error_msg = $e->getMessage();
         }
     }
@@ -43,7 +39,7 @@ if (!empty($_POST["title"]) && !empty($_POST["category"]) && !empty($_FILES['ima
 
 try {
     $categories = Category::getAll();
-} catch (Exception $e) {
+} catch (SQLException $e) {
     die($e->getMessage());
 }
 
@@ -82,7 +78,7 @@ try {
             <label for="category">Categorie</label>
             <select name="category" id="category">
                 <?php foreach ($categories as $category): ?>
-                    <option value="<?= $category->getId() ?>"><?= $category->getName() ?></option>
+                    <option value="<?= $category->getId() ?>"><?= htmlentities($category->getName()) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>

@@ -2,28 +2,24 @@
 require_once "includes/functions.php";
 
 if (!is_connected()) {
-    header('Location: login.php');
+    header('Location: login.php?err=NotConnected');
     die;
 }
 
 try {
     $user = User::findById($_SESSION['user_id'] ?? null);
-    $username = $user->getUsername();
-    $avatar_url = $user->getAvatarUrl();
-} catch (Exception $e) {
-    $error_msg = $e->getMessage();
+    $username = htmlentities($user->getUsername());
+    $email = htmlentities($user->getEmail());
+    $avatar_url = htmlentities($user->getAvatarUrl());
+} catch (ObjectNotFoundException|ObjectDeletedException|SQLException $e) {
+    die($e->getMessage());
 }
-
-if ($user->isDeleted()) {
-    header('Location: login.php');
-    die;
-}
-
 
 if (isset($_POST['logout'])) {
     session_destroy();
-    header('Location: login.php');
+    header('Location: login.php?err=LogOut');
 }
+
 try {
     if (!empty($_POST['email'])) {
         $user->setEmail($_POST['email']);
@@ -40,10 +36,10 @@ try {
         if (move_uploaded_file($_FILES['avatar']['tmp_name'], $avatar_url)) {
             $user->setAvatarUrl($avatar_url);
         } else {
-            echo ('Error uploading avatar');
+            echo('Error uploading avatar');
         }
     }
-} catch (Exception $e) {
+} catch (ObjectDeletedException|SQLException $e) {
     $error_msg = $e->getMessage();
 }
 
@@ -76,7 +72,7 @@ try {
             <form method="post" action="account.php" enctype="multipart/form-data">
                 <div class="input_block">
                     <label for="username">Nom d'utilisateur</label>
-                    <input type="text" name="username" id="username" placeholder="Nom d'utilisateur" value="<?= $user->getUsername() ?>">
+                    <input type="text" name="username" id="username" placeholder="Nom d'utilisateur" value="<?= $username ?>">
                 </div>
                 <div class="input_block">
                     <label for="avatar">Photo de profil</label>
@@ -84,7 +80,7 @@ try {
                 </div>
                 <div class="input_block">
                     <label for="email">Email</label>
-                    <input type="text" name="email" id="email" placeholder="Email" value="<?= $user->getEmail() ?>">
+                    <input type="text" name="email" id="email" placeholder="Email" value="<?= $email ?>">
                 </div>
                 <div class="input_block">
                     <label for="password">Mot de passe</label>

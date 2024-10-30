@@ -22,15 +22,15 @@ class User {
     }
 
     public function isAdmin(): bool {
-        if ($this->is_deleted) throw new Exception('User is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return boolval($this->admin ?? 0);
     }
     public function isArticleOwner($article): bool {
-        if ($this->is_deleted) throw new Exception('User is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return $article->is_author($this->id) ?? false;
     }
     public function verifyPassword($password): bool {
-        if ($this->is_deleted) throw new Exception('User is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return password_verify($password, $this->password ?? '');
     }
 
@@ -39,27 +39,27 @@ class User {
     }
 
     public function getId(): int {
-        if ($this->is_deleted) throw new Exception('User is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return $this->id;
     }
 
     public function getUsername(): string {
-        if ($this->is_deleted) throw new Exception('User is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return $this->username;
     }
 
     public function getEmail(): string {
-        if ($this->is_deleted) throw new Exception('User is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return $this->email;
     }
 
     public function getAvatarUrl(): string {
-        if ($this->is_deleted) throw new Exception('User is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return $this->avatar_url;
     }
 
     public function setAvatarUrl($avatar_url): void {
-        if ($this->is_deleted) throw new Exception('User is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare('UPDATE users SET avatar_url = ? WHERE id = ?');
@@ -67,12 +67,12 @@ class User {
 
             $this->avatar_url = $avatar_url;
         } catch (PDOException $e) {
-            throw new Exception("PDOException: ".$e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 
     public function setUsername(string $username): void {
-        if ($this->is_deleted) throw new Exception('User is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare('UPDATE users SET username = ? WHERE id = ?');
@@ -80,12 +80,12 @@ class User {
 
             $this->username = $username;
         } catch (PDOException $e) {
-            throw new Exception("PDOException: ".$e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 
     public function setEmail(string $email): void {
-        if ($this->is_deleted) throw new Exception('User is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare('UPDATE users SET email = ? WHERE id = ?');
@@ -93,12 +93,12 @@ class User {
 
             $this->email = $email;
         } catch (PDOException $e) {
-            throw new Exception("PDOException: ".$e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 
     public function setPassword(string $password): void {
-        if ($this->is_deleted) throw new Exception('User is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         $hash = password_hash($password, PASSWORD_DEFAULT);
         try {
             $conn = get_bdd_connection();
@@ -107,19 +107,31 @@ class User {
 
             $this->password = $hash;
         } catch (PDOException $e) {
-            throw new Exception("PDOException: ".$e->getMessage());
+            throw new SQLException($e->getMessage());
+        }
+    }
+
+    public function delete(): void {
+        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
+        try {
+            $conn = get_bdd_connection();
+            $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+            $stmt->execute([$this->id]);
+            $this->is_deleted = true;
+        } catch (PDOException $e) {
+            throw new SQLException($e->getMessage());
         }
     }
 
     public static function loginOrCreate($email, $password): User {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new Exception("Invalid email");
+            throw new InvalidEmailException("Invalid email");
         }
         try {
             try {
                 $user = User::findByEmail($email);
                 if (!$user->verifyPassword($password)) {
-                    throw new Exception("Wrong password");
+                    throw new IncorrectPasswordException("Wrong password");
                 }
             } catch (Exception $e) {
                 return User::create($email, $password);
@@ -127,14 +139,14 @@ class User {
 
             return $user;
         } catch (PDOException $e) {
-            throw new Exception("PDOException: ".$e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 
     public static function create($email, $password): User {
         global $DEFAULT_AVATAR_URL;
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new Exception("Invalid email");
+            throw new InvalidEmailException("Invalid email");
         }
         try {
             $hash = password_hash($password, PASSWORD_DEFAULT);
@@ -145,7 +157,7 @@ class User {
 
             return new User($conn->lastInsertId(), $email, $email, $hash, $DEFAULT_AVATAR_URL, $email);
         } catch (PDOException $e) {
-            throw new Exception("PDOException: ".$e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 
@@ -160,9 +172,9 @@ class User {
                 return new User($user['id'], $user['username'], $user['email'], $user['password'], $user['avatar_url'], $user['admin']);
             }
 
-            throw new Exception("User does not exist");
+            throw new ObjectNotFoundException("User does not exist");
         } catch (PDOException $e) {
-            throw new Exception("PDOException: ".$e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
     public static function findByEmail($email): ?User {
@@ -176,9 +188,9 @@ class User {
                 return new User($user['id'], $user['username'], $user['email'], $user['password'], $user['avatar_url'], $user['admin']);
             }
 
-            throw new Exception("User does not exist");
+            throw new ObjectNotFoundException("User does not exist");
         } catch (PDOException $e) {
-            throw new Exception("PDOException: ".$e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 }

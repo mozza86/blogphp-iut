@@ -4,21 +4,21 @@ require_once '../includes/User.php';
 require_once '../includes/functions.php';
 
 if (!is_connected()) {
-    header('Location: ../login.php');
+    header('Location: ../login.php?err=NotConnected');
     die;
 }
 try {
     $user = User::findById($_SESSION['user_id'] ?? null);
-} catch (Exception $e) {
-    $error_msg = $e->getMessage();
-}
-if (!$user->isAdmin()) {
-    header('Location: ../login.php');
-    die;
-}
-if ($user->isDeleted()) {
-    header('Location: ../login.php');
-    die;
+    if (!$user->isAdmin()) {
+        header('Location: ../login.php?err=NotAdmin');
+        die;
+    }
+    if ($user->isDeleted()) {
+        header('Location: ../login.php?err=UserDeleted');
+        die;
+    }
+} catch (ObjectDeletedException|ObjectNotFoundException|SQLException $e) {
+    die($e->getMessage());
 }
 
 if (!empty($_POST['action'])) {
@@ -36,14 +36,14 @@ if (!empty($_POST['action'])) {
             default:
                 throw new Exception('Unexpected action value');
         }
-    } catch (Exception $e) {
+    } catch (ObjectNotFoundException|ObjectDeletedException|SQLException $e) {
         die($e->getMessage());
     }
 }
 
 try {
     $categories = Category::getAll();
-} catch (Exception $e) {
+} catch (SQLException $e) {
     die($e->getMessage());
 }
 

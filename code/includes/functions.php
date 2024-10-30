@@ -3,7 +3,15 @@ require_once 'User.php';
 require_once 'bdd.php';
 
 function is_connected(): bool {
-    return !empty($_SESSION['user_id']);
+    if (!empty($_SESSION['user_id'])) {
+        try {
+            $user = User::findById($_SESSION['user_id']);
+            if (!$user->isDeleted()) {
+                return true;
+            }
+        } catch (ObjectNotFoundException|SQLException $e) {}
+    }
+    return false;
 }
 
 session_start();

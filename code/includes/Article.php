@@ -22,12 +22,12 @@ class Article {
     }
 
     public function getId(): int {
-        if ($this->is_deleted) throw new Exception('Article is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->id;
     }
 
     public function getAuthor(): User {
-        if ($this->is_deleted) throw new Exception('Article is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->author;
     }
 
@@ -36,47 +36,48 @@ class Article {
     }
 
     public function getUpdatedAt(): string {
-        if ($this->is_deleted) throw new Exception('Article is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->updated_at;
     }
 
     public function getCreatedAt(): string {
-        if ($this->is_deleted) throw new Exception('Article is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->created_at;
     }
 
     public function getImageUrl(): string {
-        if ($this->is_deleted) throw new Exception('Article is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->image_url;
     }
 
     public function getContent(): string {
-        if ($this->is_deleted) throw new Exception('Article is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->content;
     }
 
     public function getTitle(): string {
-        if ($this->is_deleted) throw new Exception('Article is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->title;
     }
 
     public function isOwner($user): bool {
-        if ($this->is_deleted) throw new Exception('Article is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         try {
             return $user->getId() == $this->getAuthor()->getId();
         } catch (Exception $e) {
-            throw $e;
+            throw new SQLException($e->getMessage());
         }
     }
 
     public function delete(): void {
-        if ($this->is_deleted) throw new Exception('Article is deleted');
+        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare("DELETE FROM articles WHERE id = ?");
             $stmt->execute([$this->id]);
+            $this->is_deleted = true;
         } catch (PDOException $e) {
-            throw new Exception("PDOException: ".$e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 
@@ -93,9 +94,9 @@ class Article {
 
             return $article;
         } catch (PDOException $e) {
-            throw new Exception("PDOException: " . $e->getMessage());
-        } catch (Exception $e) {
-            throw $e;
+            throw new SQLException($e->getMessage());
+        } catch (ObjectDeletedException $e) {
+            throw new ObjectDeletedException($e->getMessage());
         }
     }
 }

@@ -133,8 +133,12 @@ class User {
                 if (!$user->verifyPassword($password)) {
                     throw new IncorrectPasswordException("Wrong password");
                 }
-            } catch (Exception $e) {
+            } catch (ObjectNotFoundException $e) {
                 return User::create($email, $password);
+            } catch (SQLException $e) {
+                throw new SQLException($e->getMessage());
+            } catch (ObjectDeletedException $e) {
+                throw new ObjectDeletedException($e->getMessage());
             }
 
             return $user;

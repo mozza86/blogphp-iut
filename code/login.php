@@ -1,5 +1,6 @@
 <?php
 require_once "includes/functions.php";
+
 if (is_connected()) {
     try {
         $user = User::findById($_SESSION['user_id'] ?? null);
@@ -19,10 +20,11 @@ if (!empty($_POST["email"]) && !empty($_POST["password"])) {
         $_SESSION["user_id"] = $user->getId();
         header('Location: account.php');
         die;
-    } catch (ObjectDeletedException|InvalidEmailException|SQLException $e) {
+    } catch (ObjectDeletedException|InvalidEmailException|SQLException|IncorrectPasswordException $e) {
         $error_msg = $e->getMessage();
     }
 }
+
 ?>
 <!doctype html>
 <html lang="fr">

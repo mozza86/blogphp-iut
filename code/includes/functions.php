@@ -1,6 +1,6 @@
 <?php
 require_once 'User.php';
-require_once 'bdd.php';
+require_once 'Exceptions.php';
 
 function is_connected(): bool {
     if (!empty($_SESSION['user_id'])) {

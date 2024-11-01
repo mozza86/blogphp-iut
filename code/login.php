@@ -11,6 +11,15 @@ if (is_connected()) {
     }
 }
 
+if (!empty($_GET['err'])) {
+    $error_msg = match ($_GET['err']) {
+        'NotConnected' => "Vous avez besoin d'etre connecté pour faire cette action",
+        'NotAdmin' => "Vous avez besoin des permissions administrateur pour faire cette action",
+        'LogOut' => "Vous avez été déconnecté",
+        'UserDeleted' => "Votre compte vient d'etre supprimé",
+    };
+}
+
 if (!empty($_POST["email"]) && !empty($_POST["password"])) {
     $email = $_POST["email"];
     $password = $_POST["password"];

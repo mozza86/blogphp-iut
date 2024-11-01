@@ -115,7 +115,7 @@ class User {
                 if (!$user->verifyPassword($password)) {
                     throw new IncorrectPasswordException("Mauvais mot de passe");
                 }
-            } catch (ObjectNotFoundException $e) {
+            } catch (UserNotFoundException $e) {
                 return User::create($email, $password);
             } catch (SQLException $e) {
                 throw new SQLException($e->getMessage());

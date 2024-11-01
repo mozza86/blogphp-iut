@@ -123,7 +123,7 @@ $comments = $article->getComments();
                 <div class="top">
                     <span class="username"><?= htmlentities($comment->getAuthor()->getUsername()) ?></span>
                     <span class="date"><?= $comment->getCreatedAt() ?></span>
-                    <?php if ($comment->isAllowedToDelete($user)): ?>
+                    <?php if ($user && $comment->isAllowedToDelete($user)): ?>
                         <form action="article.php?id=<?= $article_id ?>" method="post">
                             <input type="hidden" name="action" value="delete_comment">
                             <input type="hidden" name="comment_id" value="<?= $comment->getId() ?>">

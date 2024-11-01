@@ -10,7 +10,6 @@ class User {
     private string $password;
     private string $avatar_url;
     private bool $admin;
-    private bool $is_deleted = false;
 
     function __construct($id, $username, $email, $password, $avatar_url, $admin) {
         $this->id = $id;
@@ -22,44 +21,32 @@ class User {
     }
 
     public function isAdmin(): bool {
-        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return boolval($this->admin ?? 0);
     }
     public function isArticleOwner($article): bool {
-        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return $article->is_author($this->id) ?? false;
     }
     public function verifyPassword($password): bool {
-        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return password_verify($password, $this->password ?? '');
     }
 
-    public function isDeleted(): bool {
-        return $this->is_deleted;
-    }
-
     public function getId(): int {
-        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return $this->id;
     }
 
     public function getUsername(): string {
-        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return $this->username;
     }
 
     public function getEmail(): string {
-        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return $this->email;
     }
 
     public function getAvatarUrl(): string {
-        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         return $this->avatar_url;
     }
 
     public function setAvatarUrl($avatar_url): void {
-        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare('UPDATE users SET avatar_url = ? WHERE id = ?');
@@ -72,7 +59,6 @@ class User {
     }
 
     public function setUsername(string $username): void {
-        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare('UPDATE users SET username = ? WHERE id = ?');
@@ -85,7 +71,6 @@ class User {
     }
 
     public function setEmail(string $email): void {
-        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare('UPDATE users SET email = ? WHERE id = ?');
@@ -98,7 +83,6 @@ class User {
     }
 
     public function setPassword(string $password): void {
-        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         $hash = password_hash($password, PASSWORD_DEFAULT);
         try {
             $conn = get_bdd_connection();
@@ -112,12 +96,10 @@ class User {
     }
 
     public function delete(): void {
-        if ($this->is_deleted) throw new ObjectDeletedException('User is deleted');
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
             $stmt->execute([$this->id]);
-            $this->is_deleted = true;
         } catch (PDOException $e) {
             throw new SQLException($e->getMessage());
         }

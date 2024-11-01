@@ -9,7 +9,8 @@ class Article {
     private string $image_url;
     private string $created_at;
     private string $updated_at;
-    private bool $is_deleted = false;
+
+    private array $comments;
 
     function __construct($id, $title, $content, $author, $image_url, $created_at, $updated_at) {
         $this->id = $id;
@@ -22,41 +23,30 @@ class Article {
     }
 
     public function getId(): int {
-        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->id;
     }
 
     public function getAuthor(): User {
-        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->author;
     }
 
-    public function isDeleted(): bool {
-        return $this->is_deleted;
-    }
-
     public function getUpdatedAt(): string {
-        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->updated_at;
     }
 
     public function getCreatedAt(): string {
-        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->created_at;
     }
 
     public function getImageUrl(): string {
-        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->image_url;
     }
 
     public function getContent(): string {
-        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->content;
     }
 
     public function getTitle(): string {
-        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         return $this->title;
     }
 
@@ -70,12 +60,10 @@ class Article {
     }
 
     public function delete(): void {
-        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare("DELETE FROM articles WHERE id = ?");
             $stmt->execute([$this->id]);
-            $this->is_deleted = true;
         } catch (PDOException $e) {
             throw new SQLException($e->getMessage());
         }

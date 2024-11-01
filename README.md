@@ -1,16 +1,12 @@
 # blogphp
-trucs faits:
-- Une page de connexion (email, mot de passe) qui créera un utilisateur à la volée si son
-  compte n’existe pas ; Chaque page suivant redirige vers celle-ci si l’utilisateur n’est pas
-  connecté.
-- Une page de création d’article avec une ou plusieurs catégories (et les autres attributs)
-- Une page qui liste les articles (page d’accueil) et qui permet de filtrer l’affichage par pseudo
-- Une page qui affiche un article et ses commentaires (avec un formulaire d’ajout de
-  commentaire)
-- La possibilité pour le propriétaire de l’article ou du commentaire de supprimer leur participation
 
-trucs a faire:
-
-- Un CRUD pour les catégories (avec un préfix « /admin ») et accessible uniquement pour
-  l’admin (admin@localhost.fr ; mdp : « admin69IUT; » )
-
+Fonctionnalitées:
+- Page de connexion (email, mdp) avec création à la volée de l'utilisateur si il n'existe pas
+- Page de création d'article (titre, catégorie, image, contenu)
+- Page d'accueil qui affiche les articles avec filtres (auteur, catégorie, titre, contenu)
+- Page d'article avec commentaires
+- Ajouter un commentaire a un article
+- Supprimer son propre commentaire
+- Supprimer le commentaire de quelqu'un d'autre si on est admin
+- Page réservée à l'admin qui permet de faire les actions CRUD sur les catégories (Ajouter, Lire, Mettre à jour, Supprimer)
+- Compte administrateur: Email: admin@localhost.fr  Mot de passe: admin69IUT

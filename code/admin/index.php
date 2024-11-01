@@ -24,12 +24,15 @@ if (!empty($_POST['action'])) {
         switch ($_POST['action']) {
             case 'create':
                 Category::create($_POST['name']);
+                refresh_page();
                 break;
             case 'update':
                 Category::findById($_POST['id'])->update($_POST['name']);
+                refresh_page();
                 break;
             case 'delete':
                 Category::findById($_POST['id'])->delete();
+                refresh_page();
                 break;
             default:
                 throw new Exception('Unexpected action value');

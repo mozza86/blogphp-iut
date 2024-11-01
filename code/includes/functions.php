@@ -12,4 +12,9 @@ function is_connected(): bool {
     return false;
 }
 
+function refresh_page(): void {
+    $URI = $_SERVER['REQUEST_URI'];
+    header("Location: $URI");
+}
+
 session_start();

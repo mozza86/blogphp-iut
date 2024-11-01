@@ -23,18 +23,22 @@ if (isset($_POST['logout'])) {
 try {
     if (!empty($_POST['email'])) {
         $user->setEmail($_POST['email']);
+        refresh_page();
     }
     if (!empty($_POST['password'])) {
         $user->setPassword($_POST['password']);
+        refresh_page();
     }
     if (!empty($_POST['username'])) {
         $user->setUsername($_POST['username'] ?? $user->getEmail());
+        refresh_page();
     }
     if(!empty($_FILES['avatar']) && !empty($_FILES['avatar']['tmp_name'])) {
         $avatar_url = 'uploads/'.uniqid().'.png';
 
         if (move_uploaded_file($_FILES['avatar']['tmp_name'], $avatar_url)) {
             $user->setAvatarUrl($avatar_url);
+            refresh_page();
         } else {
             $error_msg = 'Error uploading avatar';
         }

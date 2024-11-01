@@ -1,5 +1,6 @@
 <?php
 require_once 'bdd.php';
+require_once 'Comment.php';
 
 class Article {
     private int $id;
@@ -20,6 +21,25 @@ class Article {
         $this->image_url = $image_url;
         $this->created_at = $created_at;
         $this->updated_at = $updated_at;
+
+        try {
+            $conn = get_bdd_connection();
+            $stmt = $conn->prepare('SELECT * FROM comments where article_id = ?');
+            $stmt->execute([$this->getId()]);
+
+            $comments = $stmt->fetchAll();
+
+            $comments_array = array();
+            foreach ($comments as $comment) {
+                $comments_array[] = new Comment($comment['id'], User::findById($comment['author_id']), $comment['content'], $this, $comment['created_at'], $comment['updated_at']);
+            }
+            $this->comments = $comments_array;
+            
+        } catch (SQLException $e) {
+            throw new SQLException($e->getMessage());
+        } catch (UserNotFoundException $e) {
+            throw new UserNotFoundException($e->getMessage());
+        }
     }
 
     public function getId(): int {
@@ -50,13 +70,18 @@ class Article {
         return $this->title;
     }
 
-    public function isOwner($user): bool {
-        if ($this->is_deleted) throw new ObjectDeletedException('Article is deleted');
-        try {
-            return $user->getId() == $this->getAuthor()->getId();
-        } catch (Exception $e) {
-            throw new SQLException($e->getMessage());
+    public function getComments(): array {
+        return $this->comments;
+    }
+
+    public function isAllowedToDelete($user): bool {
+        if ($user->getId() == $this->getAuthor()->getId()) {
+            return true;
         }
+        if ($user->isAdmin()) {
+            return true;
+        }
+        return false;
     }
 
     public function delete(): void {
@@ -81,7 +106,26 @@ class Article {
             $stmt->execute([$article->getId(), $category->getId()]);
 
             return $article;
-        } catch (PDOException $e) {
+        } catch (PDOException|SQLException  $e) {
+            throw new SQLException($e->getMessage());
+        } catch (UserNotFoundException $e) {
+            throw new UserNotFoundException($e->getMessage());
+        }
+    }
+
+    public static function findById(int $id): Article {
+        try {
+            $conn = get_bdd_connection();
+            $stmt = $conn->prepare('SELECT * FROM articles where id = ?');
+            $stmt->execute([$id]);
+
+            $article = $stmt->fetch();
+            if ($article) {
+                return new Article($article['id'], $article['title'], $article['content'], User::findById($article['author_id']), $article['image_url'], $article['created_at'], $article['updated_at']);
+            }
+
+            throw new ArticleNotFoundException("L'article $id n'existe pas");
+        } catch (PDOException|SQLException $e) {
             throw new SQLException($e->getMessage());
         } catch (UserNotFoundException $e) {
             throw new UserNotFoundException("L'auteur de l'article n'existe pas");

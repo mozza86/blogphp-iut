@@ -125,20 +125,18 @@ class User {
 
     public static function loginOrCreate($email, $password): User {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidEmailException("Invalid email");
+            throw new InvalidEmailException("Email invalide");
         }
         try {
             try {
                 $user = User::findByEmail($email);
                 if (!$user->verifyPassword($password)) {
-                    throw new IncorrectPasswordException("Wrong password");
+                    throw new IncorrectPasswordException("Mauvais mot de passe");
                 }
             } catch (ObjectNotFoundException $e) {
                 return User::create($email, $password);
             } catch (SQLException $e) {
                 throw new SQLException($e->getMessage());
-            } catch (ObjectDeletedException $e) {
-                throw new ObjectDeletedException($e->getMessage());
             }
 
             return $user;
@@ -150,7 +148,7 @@ class User {
     public static function create($email, $password): User {
         global $DEFAULT_AVATAR_URL;
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidEmailException("Invalid email");
+            throw new InvalidEmailException("Email invalide");
         }
         try {
             $hash = password_hash($password, PASSWORD_DEFAULT);
@@ -176,7 +174,7 @@ class User {
                 return new User($user['id'], $user['username'], $user['email'], $user['password'], $user['avatar_url'], $user['admin']);
             }
 
-            throw new ObjectNotFoundException("User does not exist");
+            throw new UserNotFoundException("L'utilisateur $id n'existe pas");
         } catch (PDOException $e) {
             throw new SQLException($e->getMessage());
         }
@@ -192,7 +190,8 @@ class User {
                 return new User($user['id'], $user['username'], $user['email'], $user['password'], $user['avatar_url'], $user['admin']);
             }
 
-            throw new ObjectNotFoundException("User does not exist");
+            $htmlemail = htmlentities($email);
+            throw new UserNotFoundException("L'utilisateur $htmlemail n'existe pas");
         } catch (PDOException $e) {
             throw new SQLException($e->getMessage());
         }

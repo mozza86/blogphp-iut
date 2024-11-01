@@ -6,7 +6,7 @@ if (is_connected()) {
         $user = User::findById($_SESSION['user_id'] ?? null);
         $username = $user->getUsername();
         $avatar_url = $user->getAvatarUrl();
-    } catch (ObjectNotFoundException|ObjectDeletedException|SQLException $e) {
+    } catch (SQLException|UserNotFoundException $e) {
         die($e->getMessage());
     }
 }
@@ -20,7 +20,7 @@ if (!empty($_POST["email"]) && !empty($_POST["password"])) {
         $_SESSION["user_id"] = $user->getId();
         header('Location: account.php');
         die;
-    } catch (ObjectDeletedException|InvalidEmailException|SQLException|IncorrectPasswordException $e) {
+    } catch (InvalidEmailException|SQLException|IncorrectPasswordException $e) {
         $error_msg = $e->getMessage();
     }
 }

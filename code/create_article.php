@@ -12,7 +12,7 @@ try {
     $user = User::findById($_SESSION['user_id'] ?? null);
     $username = htmlentities($user->getUsername());
     $avatar_url = htmlentities($user->getAvatarUrl());
-} catch (ObjectDeletedException|SQLException|ObjectNotFoundException $e) {
+} catch (SQLException|UserNotFoundException $e) {
     die($e->getMessage());
 }
 
@@ -31,7 +31,7 @@ if (!empty($_POST["title"]) && !empty($_POST["category"]) && !empty($_FILES['ima
         try {
             $article = Article::create($title, $content, User::findById($_SESSION['user_id']), $image_url, Category::findById($category_id));
             header('Location: article.php?id='.$article->getId());
-        } catch (ObjectDeletedException|SQLException|ObjectNotFoundException $e) {
+        } catch (SQLException|ObjectNotFoundException|UserNotFoundException $e) {
             $error_msg = $e->getMessage();
         }
     }

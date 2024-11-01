@@ -7,7 +7,7 @@ if (is_connected()) {
         $user = User::findById($_SESSION['user_id'] ?? null);
         $username = $user->getUsername();
         $avatar_url = $user->getAvatarUrl();
-    } catch (ObjectNotFoundException|ObjectDeletedException|SQLException $e) {
+    } catch (UserNotFoundException|SQLException $e) {
         $error_msg = $e->getMessage();
     }
 }

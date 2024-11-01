@@ -95,8 +95,8 @@ class Article {
             return $article;
         } catch (PDOException $e) {
             throw new SQLException($e->getMessage());
-        } catch (ObjectDeletedException $e) {
-            throw new ObjectDeletedException($e->getMessage());
+        } catch (UserNotFoundException $e) {
+            throw new UserNotFoundException("L'auteur de l'article n'existe pas");
         }
     }
 }

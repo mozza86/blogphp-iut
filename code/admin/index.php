@@ -15,11 +15,7 @@ try {
         header('Location: ../login.php?err=NotAdmin');
         die;
     }
-    if ($user->isDeleted()) {
-        header('Location: ../login.php?err=UserDeleted');
-        die;
-    }
-} catch (ObjectDeletedException|ObjectNotFoundException|SQLException $e) {
+} catch (UserNotFoundException|SQLException $e) {
     die($e->getMessage());
 }
 
@@ -38,7 +34,7 @@ if (!empty($_POST['action'])) {
             default:
                 throw new Exception('Unexpected action value');
         }
-    } catch (ObjectNotFoundException|ObjectDeletedException|SQLException $e) {
+    } catch (ObjectNotFoundException|SQLException $e) {
         die($e->getMessage());
     }
 }

@@ -11,7 +11,7 @@ try {
     $username = htmlentities($user->getUsername());
     $email = htmlentities($user->getEmail());
     $avatar_url = htmlentities($user->getAvatarUrl());
-} catch (ObjectNotFoundException|ObjectDeletedException|SQLException $e) {
+} catch (UserNotFoundException|SQLException $e) {
     die($e->getMessage());
 }
 
@@ -36,10 +36,10 @@ try {
         if (move_uploaded_file($_FILES['avatar']['tmp_name'], $avatar_url)) {
             $user->setAvatarUrl($avatar_url);
         } else {
-            echo('Error uploading avatar');
+            $error_msg = 'Error uploading avatar';
         }
     }
-} catch (ObjectDeletedException|SQLException $e) {
+} catch (SQLException $e) {
     $error_msg = $e->getMessage();
 }
 

@@ -67,6 +67,97 @@ main {
   display: flex;
   padding: 0 20px;
 
+  &.article {
+    flex-direction: column;
+    gap: 32px;
+    max-width: 1200px;
+    width: 100%;
+    margin: auto;
+    padding-bottom: 24px;
+    > .article_content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 12px;
+      .article_img {
+        height: 300px;
+      }
+    }
+    > .author {
+      display: flex;
+      align-items: center;
+      background-color: #3e3e3e;
+      border-radius: 4px;
+      gap: 10px;
+      padding: 16px 24px;
+      > img {
+        width: 80px;
+        border-radius: 100px;
+      }
+      > .infos {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        .username {
+          font-weight: bold;
+        }
+      }
+    }
+    > .comments {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      > .new_comment {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        .top {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-left: 46px;
+        }
+        .bottom {
+          display: flex;
+          gap: 8px;
+          img {
+            width: 38px;
+            margin-bottom: auto;
+          }
+          textarea {
+            flex: 1;
+          }
+        }
+      }
+      > .comment {
+        display: flex;
+        gap : 8px;
+        img {
+          width: 38px;
+          margin-bottom: auto;
+        }
+        .content {
+          flex: 1;
+          .top {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            .username {
+              color: #db935f;
+            }
+            .date {
+              color: #646464;
+            }
+            a {
+              background-color: white;
+              color: black;
+            }
+          }
+        }
+      }
+    }
+  }
   &.login, &.account, &.create_article, &.admin {
     justify-content: center;
     align-items: center;
@@ -224,15 +315,15 @@ label {
     font-weight: bold;
     font-size: larger;
   }
-  input, textarea, select {
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    background-color: #646464;
-    color: #D9D9D9;
-    &:focus {
-      outline: solid #db935f;
-    }
+}
+input, textarea, select {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background-color: #646464;
+  color: #D9D9D9;
+  &:focus {
+    outline: solid #db935f;
   }
 }
 fieldset {

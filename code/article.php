@@ -1,160 +1,143 @@
 <?php
-require_once 'includes/functions.php';
-require_once 'includes/article_functions.php';
+require_once 'includes/Article.php';
+require_once 'includes/Category.php';
+require_once "includes/functions.php";
 
-function is_admin() {
-    return $_SESSION['user']['admin'] ?? 0;
+if (empty($_GET['id'])) {
+    die('Aucun article');
 }
-$article_row = null;
-if (!empty($_GET['id'])) {
-    $article_id = $_GET['id'];
+
+$article_id = $_GET['id'];
+try {
+    $article = Article::findById($article_id);
+    $article_title = htmlentities($article->getTitle());
+    $article_image = $article->getImageUrl();
+    $article_content = htmlentities($article->getContent());
+    $author_avatar = $article->getAuthor()->getAvatarUrl();
+    $author_username = htmlentities($article->getAuthor()->getUsername());
+    $article_updated_at = $article->getUpdatedAt();
+    $article_created_at = $article->getCreatedAt();
+} catch (SQLException|ArticleNotFoundException|UserNotFoundException $e) {
+    die($e->getMessage());
+}
+
+$user = null;
+if (is_connected()) {
     try {
-        $conn = new PDO('mysql:host=localhost;dbname=blog','root','');
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $sql = 'SELECT * FROM articles a join users u on a.author_id = u.id where a.id = ?';
-        $stmt= $conn->prepare($sql);
-        $stmt->execute([ $article_id ]);
+        $user = User::findById($_SESSION['user_id'] ?? null);
+        $username = htmlentities($user->getUsername());
+        $avatar_url = htmlentities($user->getAvatarUrl());
+    } catch (SQLException $e) {
+        $error_msg = $e->getMessage();
+    } catch (UserNotFoundException $e) {
+        $user = null;
+    }
 
-        $article_row = $stmt->fetch();
-    } catch(PDOException $e) {
-        die("SQL error: ".$e->getMessage());
+    if ($user && !empty($_POST['action'])) {
+        $action = $_POST['action'];
+        if ($action == "new_comment" && !empty($_POST['comment'])) {
+            $content = $_POST['comment'];
+
+            try {
+                Comment::create($content, $user, $article);
+                refresh_page();
+            } catch (SQLException $e) {
+                $error_msg = $e->getMessage();
+            }
+        }
+
+        if ($action == "delete" && $article->isAllowedToDelete($user)) {
+            try {
+                $article->delete();
+                refresh_page();
+            } catch (SQLException $e) {
+                $error_msg = $e->getMessage();
+            }
+        }
+
+        if ($action == "delete_comment") {
+            $comment_id = $_POST['comment_id'];
+            try {
+                $comment = Comment::findById($comment_id);
+                if ($comment->isAllowedToDelete($user)) {
+                    $comment->delete();
+                    refresh_page();
+                }
+            } catch (ArticleNotFoundException|CommentNotFoundException|SQLException|UserNotFoundException $e) {
+                $error_msg = $e->getMessage();
+            }
+        }
     }
 }
 
-if ($article_row) {
-    // supprime le post quand le bouton est cliqué
-    if (!empty($_POST['action']) && $_POST['action'] == "delete" && is_connected() && (is_admin() || is_article_admin($article_row))) {
-        delete_article_database($_GET['id']);
-    }
-    // supprime le commentaire quand le bouton est cliqué
-    if (!empty($_POST['action']) && $_POST['action'] == "delete_comment" && !empty($_POST['comment_id']) && is_connected()) {
-        $comment_id = $_POST['comment_id'];
+$comments = $article->getComments();
 
-        try {
-            $conn = new PDO('mysql:host=localhost;dbname=blog','root','');
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $sql = 'SELECT * FROM comments where id = ?';
-            $stmt= $conn->prepare($sql);
-            $stmt->execute([ $comment_id ]);
+?>
 
-            $comment_row = $stmt->fetch();
-        } catch(PDOException $e) {
-            die("SQL error: ".$e->getMessage());
-        }
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Blog - Article</title>
+    <link rel="stylesheet" href="res/css/style.css">
+</head>
+<body>
+<?php require_once "includes/header.php"; ?>
+<main class="article">
+    <div class="article_content">
+        <h1><?= $article_title ?></h1>
+        <img class="article_img" src="<?= $article_image ?>" alt="l'image de l'article">
+        <p>
+            <?= $article_content ?>
+        </p>
+    </div>
+    <div class="author">
+        <img src="<?= $author_avatar ?>" alt="l'image de l'auteur">
+        <div class="infos">
+            <span class="username"><?= $author_username ?></span>
+            <span class="date">Publié le <?= $article_created_at ?><?= (($article_updated_at != $article_created_at ? ", mis à jour le $article_updated_at" : ''))?></span>
+        </div>
+    </div>
+    <div class="comments">
+        <h2><?= count($comments) ?> Commentaire(s)</h2>
+        <?php if ($user): ?>
+        <form class="new_comment" action="article.php?id=<?= $article_id ?>" method="post">
+            <input type="hidden" name="action" value="new_comment">
+            <div class="top">
+                <label for="new_comment">Nouveau commentaire</label>
+                <input type="submit" value="Envoyer">
+            </div>
+            <div class="bottom">
+                <img src="<?= $user->getAvatarUrl() ?>" alt="Avatar de <?= htmlentities($user->getUsername()) ?>">
+                <textarea name="comment" id="new_comment" cols="100" rows="4" placeholder="Nouveau commentaire"></textarea>
+            </div>
+        </form>
+        <?php endif; ?>
 
-        if (!empty($comment_row['author_id']) && $_SESSION["user"]["id"] == $comment_row['author_id'] || is_admin()){
-            delete_message($_POST['comment_id']);
-        }
-    }
-    // ajout d'un commentaire
-    if (!empty($_POST['action']) && $_POST['action'] == "new_comment" && !empty($_POST['comment']) && is_connected()) {
-        $comment = $_POST['comment'];
-        $author_id = $_SESSION['user']['id'];
-        $article_id = $_GET['id'];
-
-        try {
-            $conn = new PDO('mysql:host=localhost;dbname=blog', 'root', '');
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $stmt = $conn->prepare("INSERT INTO comments (author_id, content, article_id) VALUES(?, ?, ?)");
-            $stmt->execute([$author_id, $comment, $article_id]);
-        } catch (PDOException $e) {
-            die ('Erreur pdo' . $e->getMessage());
-        } catch (Exception $e) {
-            die ('Erreur général' . $e->getMessage());
-        }
-    }
-    ?>
-
-    <div class="container">
-        <div class="article_details">
-            <h1><?= htmlentities($article_row['title']) ?></h1>
-            <p>Published the <?= $article_row['created_at'] ?></p>
-            <div class="author_card">
-                <img src="<?= $article_row['avatar_url'] ?>" alt="Image de l'article">
-                <div class="text">
-                    <span class="author"><?= $article_row['username'] ?></span>
-                    <span class="bio">"<?= $article_row['description'] ?>"</span>
+        <?php foreach ($comments as $comment): ?>
+        <div class="comment">
+            <img src="<?= $comment->getAuthor()->getAvatarUrl() ?>" alt="Avatar de <?= htmlentities($comment->getAuthor()->getUsername()) ?>">
+            <div class="content">
+                <div class="top">
+                    <span class="username"><?= htmlentities($comment->getAuthor()->getUsername()) ?></span>
+                    <span class="date"><?= $comment->getCreatedAt() ?></span>
+                    <?php if ($comment->isAllowedToDelete($user)): ?>
+                        <form action="article.php?id=<?= $article_id ?>" method="post">
+                            <input type="hidden" name="action" value="delete_comment">
+                            <input type="hidden" name="comment_id" value="<?= $comment->getId() ?>">
+                            <input type="submit" value="Supprimer">
+                        </form>
+                    <?php endif; ?>
+                </div>
+                <div class="bottom">
+                    <?= htmlentities($comment->getContent()) ?>
                 </div>
             </div>
         </div>
+        <?php endforeach; ?>
     </div>
-
-    <main class="article">
-        <article>
-            <div class="container">
-                <img alt="" src="<?= $article_row['image_url'] ?>">
-                <!-- bouston de supression affiché que si l'utilisateur est admin ou créateur du post -->
-                <?php if (is_admin() || is_article_admin($article_row)) { ?>
-                    <form action="article.php?id=<?= $_GET['id'] ?>" method="post">
-                        <input type="hidden" name="action" value="delete">
-                        <input type="submit" value="Supprimer">
-                    </form>
-                <?php } ?>
-                <p>
-                    <?= htmlentities($article_row['content']) ?>
-                </p>
-            </div>
-        </article>
-        <div class="container">
-            <fieldset>
-                <legend>Commentaire</legend>
-                <?php if (is_connected()) { ?>
-                    <form action="article.php?id=<?= $_GET['id'] ?>" method="post">
-                        <input type="hidden" name="action" value="new_comment">
-                        <label>
-                            Commentaire:
-                            <input type="text" name="comment" placeholder="Commentaire">
-                        </label>
-                        <input type="submit" value="Envoyer">
-                    </form>
-                <?php
-                }
-
-                try {
-                    $conn = new PDO('mysql:host=localhost;dbname=blog','root','');
-                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                    $sql =  'SELECT c.id, c.content as content, u.username as username, u.avatar_url as avatar_url FROM comments c join users u on c.author_id = u.id where c.article_id = ? order by created_at desc limit 25';
-                    $stmt = $conn->prepare($sql);
-                    $stmt->execute([$_GET['id']]);
-                    $values = $stmt->fetchAll();
-                    $conn = null;
-                } catch(PDOException $e) {
-                    echo "SQL error: ".$e->getMessage();
-                }
-
-                foreach  ($values as $row) {
-                    ?>
-                    <div class="comment">
-                        <div class="author_card">
-                            <img src="<?= $row['avatar_url'] ?>" alt="Image de profil de <?= htmlentities($row['username']) ?>">
-                            <span class="username"><?= htmlentities($row['username']) ?></span>
-                            <form action="article.php?id=<?= $_GET['id'] ?>" method="post">
-                                <input type="hidden" name="action" value="delete_comment">
-                                <input type="hidden" name="comment_id" value="<?= $row['id'] ?>">
-                                <input type="submit" value="Supprimer">
-                            </form>
-                        </div>
-                        <div class="text"><?= htmlentities($row['content']) ?></div>
-                    </div>
-                    <?php
-                }
-                ?>
-            </fieldset>
-        </div>
-    </main>
-
-<?php
-
-} else {
-
-    ?>
-    <main class="error">
-        <div class="container">
-            L'article n'existe pas
-        </div>
-    </main>
-    <?php
-}
-?>
-
-
+</main>
+</body>
+</html>

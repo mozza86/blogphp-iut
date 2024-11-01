@@ -66,6 +66,97 @@ main {
   display: flex;
   padding: 0 20px;
 }
+main.article {
+  flex-direction: column;
+  gap: 32px;
+  max-width: 1200px;
+  width: 100%;
+  margin: auto;
+  padding-bottom: 24px;
+}
+main.article > .article_content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+}
+main.article > .article_content .article_img {
+  height: 300px;
+}
+main.article > .author {
+  display: flex;
+  align-items: center;
+  background-color: #3e3e3e;
+  border-radius: 4px;
+  gap: 10px;
+  padding: 16px 24px;
+}
+main.article > .author > img {
+  width: 80px;
+  border-radius: 100px;
+}
+main.article > .author > .infos {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+main.article > .author > .infos .username {
+  font-weight: bold;
+}
+main.article > .comments {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+main.article > .comments > .new_comment {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+main.article > .comments > .new_comment .top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 46px;
+}
+main.article > .comments > .new_comment .bottom {
+  display: flex;
+  gap: 8px;
+}
+main.article > .comments > .new_comment .bottom img {
+  width: 38px;
+  margin-bottom: auto;
+}
+main.article > .comments > .new_comment .bottom textarea {
+  flex: 1;
+}
+main.article > .comments > .comment {
+  display: flex;
+  gap: 8px;
+}
+main.article > .comments > .comment img {
+  width: 38px;
+  margin-bottom: auto;
+}
+main.article > .comments > .comment .content {
+  flex: 1;
+}
+main.article > .comments > .comment .content .top {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+main.article > .comments > .comment .content .top .username {
+  color: #db935f;
+}
+main.article > .comments > .comment .content .top .date {
+  color: #646464;
+}
+main.article > .comments > .comment .content .top a {
+  background-color: white;
+  color: black;
+}
 main.login, main.account, main.create_article, main.admin {
   justify-content: center;
   align-items: center;
@@ -218,14 +309,15 @@ label span {
   font-weight: bold;
   font-size: larger;
 }
-label input, label textarea, label select {
+
+input, textarea, select {
   padding: 10px;
   border-radius: 10px;
   border: none;
   background-color: #646464;
   color: #D9D9D9;
 }
-label input:focus, label textarea:focus, label select:focus {
+input:focus, textarea:focus, select:focus {
   outline: solid #db935f;
 }
 

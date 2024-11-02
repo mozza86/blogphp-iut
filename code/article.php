@@ -118,7 +118,7 @@ $comments = $article->getComments();
             </div>
             <div class="bottom">
                 <img src="<?= $avatar_url ?>" alt="Avatar de <?= $username ?>">
-                <textarea name="comment" id="new_comment" cols="100" rows="4" placeholder="Nouveau commentaire"></textarea>
+                <textarea name="comment" id="new_comment" placeholder="Nouveau commentaire"></textarea>
             </div>
         </form>
         <?php endif; ?>

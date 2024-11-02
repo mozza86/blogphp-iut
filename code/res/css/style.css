@@ -72,7 +72,7 @@ main.article {
   flex-direction: column;
   gap: 32px;
   max-width: 1200px;
-  width: 100%;
+  width: calc(100% - 40px);
   margin: auto;
   padding-bottom: 24px;
 }
@@ -228,9 +228,7 @@ main.home .articles article:nth-child(2n-1) {
 }
 main.home .articles article img {
   min-width: 160px;
-  min-height: 90px;
   width: 200px;
-  height: 150px;
   object-fit: cover;
   margin-right: 32px;
   border-radius: 6px;

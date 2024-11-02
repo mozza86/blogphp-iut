@@ -84,7 +84,7 @@ class Article {
         return false;
     }
 
-    public function delete(): void {
+    public function deleteArticle(): void {
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare("DELETE FROM articles WHERE id = ?");

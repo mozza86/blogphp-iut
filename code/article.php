@@ -46,11 +46,11 @@ if (is_connected()) {
             }
         }
 
-        if ($action == "delete" && $article->isAllowedToDelete($user)) {
+        if ($action == "delete_article" && $article->isAllowedToDelete($user)) {
             try {
-                $article->delete();
+                $article->deleteArticle();
                 refresh_page();
-            } catch (SQLException $e) {
+            } catch (ArticleNotFoundException|CommentNotFoundException|SQLException|UserNotFoundException $e) {
                 $error_msg = $e->getMessage();
             }
         }
@@ -88,6 +88,12 @@ $comments = $article->getComments();
 <main class="article">
     <div class="article_content">
         <h1><?= $article_title ?></h1>
+        <?php if ($user && $article->isAllowedToDelete($user)): ?>
+            <form action="article.php?id=<?= $article_id ?>" method="post">
+                <input type="hidden" name="action" value="delete_article">
+                <input type="submit" value="Supprimer l'article">
+            </form>
+        <?php endif; ?>
         <img class="article_img" src="<?= $article_image ?>" alt="l'image de l'article">
         <p>
             <?= $article_content ?>

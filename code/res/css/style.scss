@@ -18,7 +18,7 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  //height: 50px;
+  min-height: 50px;
   padding: 4px 20px;
   overflow: hidden;
 
@@ -67,7 +67,6 @@ main {
   flex: 1;
   display: flex;
   padding: 0 20px;
-
   &.article {
     flex-direction: column;
     gap: 32px;
@@ -82,7 +81,7 @@ main {
       flex-direction: column;
       gap: 12px;
       .article_img {
-        height: 300px;
+        max-height: 300px;
       }
     }
     > .author {

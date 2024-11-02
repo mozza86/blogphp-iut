@@ -5,7 +5,7 @@ require_once "includes/Category.php";
 if (is_connected()) {
     try {
         $user = User::findById($_SESSION['user_id'] ?? null);
-        $username = $user->getUsername();
+        $username = htmlspecialchars($user->getUsername());
         $avatar_url = $user->getAvatarUrl();
     } catch (UserNotFoundException|SQLException $e) {
         $error_msg = $e->getMessage();
@@ -88,7 +88,7 @@ try {
                 <select name="categorie">
                     <option value="">Toutes</option>
                     <?php foreach ($categories as $category): ?>
-                        <option value="<?= $category->getId() ?>"><?= htmlentities($category->getName()) ?></option>
+                        <option value="<?= $category->getId() ?>"><?= htmlspecialchars($category->getName()) ?></option>
                     <?php endforeach; ?>
                 </select>
             </label>
@@ -106,10 +106,10 @@ try {
         <div class="articles">
             <?php foreach ($values as $row): ?>
                 <article>
-                    <img src="<?= htmlentities($row['image_url']) ?>" alt="Image de l'article">
+                    <img src="<?= $row['image_url'] ?>" alt="Image de l'article">
                     <div class="preview">
-                        <h4><?= htmlentities($row['title']) ?></h4>
-                        <p><?= htmlentities($row['content']) ?></p>
+                        <h4><?= htmlspecialchars($row['title']) ?></h4>
+                        <p><?= htmlspecialchars($row['content']) ?></p>
                         <a href="article.php?id=<?= $row['article_id'] ?>">Lire Plus</a>
                     </div>
                 </article>

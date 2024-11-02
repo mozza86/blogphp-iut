@@ -1,7 +1,7 @@
 <?php
+require_once '../includes/functions.php';
 require_once '../includes/Category.php';
 require_once '../includes/User.php';
-require_once '../includes/functions.php';
 
 $__PAGE_PREFIX = '../';
 
@@ -81,7 +81,7 @@ try {
                 <legend>Liste des catégories</legend>
                 <ul>
                     <?php foreach ($categories as $category): ?>
-                        <li><?= $category->getName() ?></li>
+                        <li><?= htmlspecialchars($category->getName()) ?></li>
                     <?php endforeach; ?>
                 </ul>
             </fieldset>
@@ -94,7 +94,7 @@ try {
                         Catégorie:
                         <select name="id">
                             <?php foreach ($categories as $category): ?>
-                                <option value="<?= $category->getId() ?>"><?= $category->getName() ?></option>
+                                <option value="<?= $category->getId() ?>"><?= htmlspecialchars($category->getName()) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </label>
@@ -114,7 +114,7 @@ try {
                         Catégorie:
                         <select name="id">
                             <?php foreach ($categories as $category): ?>
-                                <option value="<?= $category->getId() ?>"><?= $category->getName() ?></option>
+                                <option value="<?= $category->getId() ?>"><?= htmlspecialchars($category->getName()) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </label>

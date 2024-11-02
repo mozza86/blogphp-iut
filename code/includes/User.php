@@ -1,7 +1,7 @@
 <?php
 require_once 'bdd.php';
 
-$DEFAULT_AVATAR_URL = 'default.png';
+$DEFAULT_AVATAR_URL = 'res/img/default-avatar.png';
 
 class User {
     private int $id;

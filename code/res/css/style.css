@@ -18,6 +18,7 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-height: 50px;
   padding: 4px 20px;
   overflow: hidden;
 }
@@ -83,7 +84,7 @@ main.article > .article_content {
   gap: 12px;
 }
 main.article > .article_content .article_img {
-  height: 300px;
+  max-height: 300px;
 }
 main.article > .author {
   display: flex;

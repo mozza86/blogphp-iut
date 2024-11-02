@@ -1,4 +1,8 @@
 <?php
+
+$ARTICLE_IMG_DIR = 'articleImgs/';
+$AVATAR_IMG_DIR = 'avatars/';
+
 require_once 'User.php';
 require_once 'Exceptions.php';
 

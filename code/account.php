@@ -1,4 +1,5 @@
 <?php
+global $AVATAR_IMG_DIR;
 require_once "includes/functions.php";
 
 if (!is_connected()) {
@@ -8,9 +9,9 @@ if (!is_connected()) {
 
 try {
     $user = User::findById($_SESSION['user_id'] ?? null);
-    $username = htmlentities($user->getUsername());
-    $email = htmlentities($user->getEmail());
-    $avatar_url = htmlentities($user->getAvatarUrl());
+    $username = htmlspecialchars($user->getUsername());
+    $email = htmlspecialchars($user->getEmail());
+    $avatar_url = $user->getAvatarUrl();
 } catch (UserNotFoundException|SQLException $e) {
     die($e->getMessage());
 }
@@ -30,11 +31,11 @@ try {
         refresh_page();
     }
     if (!empty($_POST['username'])) {
-        $user->setUsername($_POST['username'] ?? $user->getEmail());
+        $user->setUsername($_POST['username']);
         refresh_page();
     }
     if(!empty($_FILES['avatar']) && !empty($_FILES['avatar']['tmp_name'])) {
-        $avatar_url = 'uploads/'.uniqid().'.png';
+        $avatar_url = $AVATAR_IMG_DIR.uniqid().'.png';
 
         if (move_uploaded_file($_FILES['avatar']['tmp_name'], $avatar_url)) {
             $user->setAvatarUrl($avatar_url);

@@ -4,7 +4,7 @@ require_once "includes/functions.php";
 if (is_connected()) {
     try {
         $user = User::findById($_SESSION['user_id'] ?? null);
-        $username = $user->getUsername();
+        $username = htmlspecialchars($user->getUsername());
         $avatar_url = $user->getAvatarUrl();
     } catch (SQLException|UserNotFoundException $e) {
         die($e->getMessage());

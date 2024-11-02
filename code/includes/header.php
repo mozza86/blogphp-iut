@@ -5,8 +5,8 @@ require_once 'User.php';
 if (is_connected()) {
     try {
         $user = User::findById($_SESSION['user_id'] ?? null);
-        $username = $user->getUsername();
-        $avatar_url = $user->getAvatarUrl();
+        $username = htmlspecialchars($user->getUsername());
+        $avatar_url = htmlspecialchars($user->getAvatarUrl());
     } catch (UserNotFoundException|SQLException $e) {
         $error_msg = $e->getMessage();
     }

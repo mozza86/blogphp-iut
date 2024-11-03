@@ -7,13 +7,13 @@ require_once '../includes/Exceptions.php';
 $__PAGE_PREFIX = '../';
 
 if (!is_connected()) {
-    header('Location: ../login.php?err=NotConnected');
+    header('Location: ../login.php?err=NotConnected&return=Admin');
     die;
 }
 try {
     $user = User::findById($_SESSION['user_id'] ?? null);
     if (!$user->isAdmin()) {
-        header('Location: ../login.php?err=NotAdmin');
+        header('Location: ../login.php?err=NotAdmin&return=Admin');
         die;
     }
 } catch (UserNotFoundException|DatabaseException $e) {

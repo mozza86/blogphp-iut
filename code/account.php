@@ -5,7 +5,7 @@ require_once 'includes/User.php';
 require_once 'includes/Exceptions.php';
 
 if (!is_connected()) {
-    header('Location: login.php?err=NotConnected');
+    header('Location: login.php?err=NotConnected&return=Account');
     die;
 }
 

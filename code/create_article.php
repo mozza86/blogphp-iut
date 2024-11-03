@@ -8,7 +8,7 @@ require_once 'includes/Exceptions.php';
 require_once 'includes/Article.php';
 
 if (!is_connected()) {
-    header('Location: login.php?err=NotConnected');
+    header('Location: login.php?err=NotConnected&return=CreateArticle');
     die;
 }
 

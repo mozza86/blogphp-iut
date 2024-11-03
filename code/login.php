@@ -20,15 +20,23 @@ if (!empty($_GET['err'])) {
         'UserDeleted' => "Votre compte vient d'etre supprimé",
     };
 }
-
 if (!empty($_POST["email"]) && !empty($_POST["password"])) {
     $email = $_POST["email"];
     $password = $_POST["password"];
-
     try {
         $user = User::loginOrCreate($email, $password);
         $_SESSION["user_id"] = $user->getId();
-        header('Location: account.php');
+
+        $return_article_id = $_GET['rid'] ?? '';
+
+        $location = match ($_GET['return'] ?? 'Account') {
+            'CreateArticle' => "create_article.php",
+            'Article' => "show_article.php?id=$return_article_id",
+            'Admin' => "admin/",
+            'Account' => "account.php",
+        };
+        header("Location: $location");
+
         die;
     } catch (DatabaseException|IncorrectPasswordException|InvalidEmailException $e) {
         $error_msg = $e->getMessage();
@@ -49,7 +57,7 @@ if (!empty($_POST["email"]) && !empty($_POST["password"])) {
 <body>
 <?php require_once "includes/header.php"; ?>
 <main class="login">
-    <form action="login.php" method="post">
+    <form action="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>" method="post">
         <label>
             <span>Email</span>
             <input type="text" name="email" placeholder="Email" value="<?= $_POST["email"] ?? '' ?>">

@@ -14,7 +14,11 @@ try {
     $article = Article::findById($article_id);
     $article_title = htmlspecialchars($article->getTitle());
     $article_image = $article->getImageUrl();
-    $article_content = ($article->getContent());
+
+    require_once 'includes/htmlpurifier-4.15.0-standalone/HTMLPurifier.standalone.php';
+    $purifier = new HTMLPurifier();
+    $article_content = $purifier->purify($article->getContent());
+
     $author_avatar = $article->getAuthor()->getAvatarUrl();
     $author_username = htmlspecialchars($article->getAuthor()->getUsername());
     $article_updated_at = $article->getUpdatedAt();
@@ -99,9 +103,9 @@ $comments = $article->getComments();
             </form>
         <?php endif; ?>
         <img class="article_img" src="<?= $article_image ?>" alt="">
-        <p>
+        <div>
             <?= $article_content ?>
-        </p>
+        </div>
     </div>
     <div class="author">
         <img src="<?= $author_avatar ?>" alt="l'image de l'auteur">

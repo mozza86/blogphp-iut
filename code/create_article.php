@@ -29,7 +29,7 @@ try {
 if (!empty($_POST["title"]) && !empty($_POST["category"]) && !empty($_POST["content"])) {
     $title = $_POST["title"];
     $category_id = $_POST["category"];
-    $content = $_POST["content"];
+    $content = $_POST['content'];
 
     $image_url = '';
     if (!empty($_FILES['image'])) {
@@ -59,31 +59,51 @@ if (!empty($_POST["title"]) && !empty($_POST["category"]) && !empty($_POST["cont
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Blog - Nouveau Article</title>
     <link rel="stylesheet" href="res/css/style.css">
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+
 </head>
 <body>
 <?php require_once "includes/header.php"; ?>
 <main class="create_article">
-    <form action="create_article.php" method="post" enctype="multipart/form-data">
+    <form action="create_article.php" method="post" onsubmit="submitQuillContent()">
         <label>
             <span>Titre</span>
-            <input type="text" name="title" placeholder="Titre">
+            <input type="text" name="title" placeholder="Titre" required>
         </label>
         <label>
             <span>Categorie</span>
-            <select name="category">
+            <select name="category" required>
                 <?php foreach ($categories as $category): ?>
                     <option value="<?= $category->getId() ?>"><?= htmlspecialchars($category->getName()) ?></option>
                 <?php endforeach; ?>
             </select>
         </label>
-        <label>
-            <span>Contenu</span>
-            <textarea name="content" cols="30" rows="10"></textarea>
-        </label>
+        <textarea id="summernote" name="content" required></textarea>
 
         <input type="submit" value="Publier">
         <p class="error_msg"><?= $error_msg ?? '' ?></p>
     </form>
+    <script>
+        $(document).ready(function() {
+            $('#summernote').summernote({
+                placeholder: 'Contenu de votre article',
+                tabsize: 2,
+                height: 300,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture', 'video']],
+                    ['view', ['codeview']]
+                ]
+            });
+        });
+    </script>
 </main>
 </body>
 </html>

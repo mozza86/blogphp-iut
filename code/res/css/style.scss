@@ -172,6 +172,11 @@ main {
       }
     }
   }
+  &.create_article {
+    form, > div {
+      max-width: calc(100% - 32px);
+    }
+  }
   &.home {
     padding: 0;
     .filters {
@@ -329,4 +334,7 @@ input, textarea, select {
 }
 fieldset {
   border-radius: 10px;
+}
+.note-editor {
+  color: white !important;
 }

@@ -173,6 +173,9 @@ main.login form, main.login > div, main.account form, main.account > div, main.c
 main.login form .error_msg, main.login > div .error_msg, main.account form .error_msg, main.account > div .error_msg, main.create_article form .error_msg, main.create_article > div .error_msg, main.admin form .error_msg, main.admin > div .error_msg {
   color: #ff4e3f;
 }
+main.create_article form, main.create_article > div {
+  max-width: calc(100% - 32px);
+}
 main.home {
   padding: 0;
 }
@@ -323,6 +326,10 @@ input:focus, textarea:focus, select:focus {
 
 fieldset {
   border-radius: 10px;
+}
+
+.note-editor {
+  color: white !important;
 }
 
 /*# sourceMappingURL=style.css.map */

@@ -1,6 +1,7 @@
 <?php
 require_once 'bdd.php';
 require_once 'Comment.php';
+require_once 'Category.php';
 
 class Article {
     private int $id;
@@ -9,8 +10,8 @@ class Article {
     private User $author;
     private string $created_at;
     private string $updated_at;
-
     private array $comments;
+    private array $categories;
 
     /**
      * Article object
@@ -46,6 +47,23 @@ class Article {
 
         } catch (UserNotFoundException $e) {
             throw new UserNotFoundException("Un des auteurs d'un des commentaires n'existe pas", 0, $e);
+        } catch (PDOException $e) {
+            throw new DatabaseException("Erreur lors de la requête à la base de données", 0, $e);
+        }
+
+        try {
+            $conn = get_bdd_connection();
+            $stmt = $conn->prepare('SELECT c.* FROM `article_categories` ac JOIN categories c on ac.category_id = c.id where article_id = ?');
+            $stmt->execute([$this->getId()]);
+
+            $categories = $stmt->fetchAll();
+
+            $categories_array = array();
+            foreach ($categories as $category) {
+                $categories_array[] = new Category($category['id'], $category['name']);
+            }
+            $this->categories = $categories_array;
+
         } catch (PDOException $e) {
             throw new DatabaseException("Erreur lors de la requête à la base de données", 0, $e);
         }
@@ -101,6 +119,13 @@ class Article {
     }
 
     /**
+     * @return array
+     */
+    public function getCategories(): array {
+        return $this->categories;
+    }
+
+    /**
      * Return if the user is allowed to delete this article
      * @param User $user
      * @return bool
@@ -135,21 +160,26 @@ class Article {
      * @param string $title
      * @param string $content
      * @param User $author
-     * @param Category $category
+     * @param array $categories
      * @return Article
      * @throws DatabaseException
      * @throws UserNotFoundException
      */
-    public static function create(string $title, string $content, User $author, Category $category): Article {
+    public static function create(string $title, string $content, User $author, array $categories): Article {
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare("INSERT INTO articles (title, content, author_id) VALUES (?,?,?)");
             $stmt->execute([$title, $content, $author->getId()]);
 
-            $article = new Article($conn->lastInsertId(), $title, $content, $author, date("Y-m-d H:i:s"), date("Y-m-d H:i:s"));
+            $article_id = $conn->lastInsertId();
 
-            $stmt = $conn->prepare("INSERT INTO article_categories (article_id, category_id) VALUES (?,?)");
-            $stmt->execute([$article->getId(), $category->getId()]);
+            foreach ($categories as $category) {
+                var_dump([$article_id, $category->getId()]);
+                $stmt = $conn->prepare("INSERT INTO article_categories (article_id, category_id) VALUES (?,?)");
+                $stmt->execute([$article_id, $category->getId()]);
+            }
+
+            $article = new Article($article_id, $title, $content, $author, date("Y-m-d H:i:s"), date("Y-m-d H:i:s"));
 
             return $article;
         } catch (PDOException $e) {
@@ -190,28 +220,30 @@ class Article {
     /**
      * Filter articles based on $values_to_filter, possible values are auteur, categorie, titre, contenu (i.e: $values_to_filter['auteur'] == 'admin')
      * @param array $values_to_filter
+     * @param int $page
      * @return array
      * @throws DatabaseException
      * @throws UserNotFoundException
      */
     public static function filter(array $values_to_filter, int $page = 1): array {
         $sql = 'SELECT *, a.id as article_id FROM articles a 
-            JOIN users u ON a.author_id = u.id 
-            JOIN article_categories ac ON a.id = ac.article_id 
-            JOIN categories c ON ac.category_id = c.id 
-            WHERE 1=1';
+            JOIN users u ON a.author_id = u.id ';
         $params = [];
+
+        // Filtrer par catégorie
+        if (!empty($values_to_filter['categorie'])) {
+            $sql .= 'JOIN article_categories ac ON a.id = ac.article_id 
+                    JOIN categories c ON ac.category_id = c.id WHERE 1=1';
+            $sql .= ' AND c.id = :categorie';
+            $params[':categorie'] = $values_to_filter['categorie'];
+        } else {
+            $sql .= ' WHERE 1=1';
+        }
 
         // Filtrer par auteur
         if (!empty($values_to_filter['auteur'])) {
             $sql .= ' AND u.username LIKE :auteur';
             $params[':auteur'] = '%' . $values_to_filter['auteur'] . '%';
-        }
-
-        // Filtrer par catégorie
-        if (!empty($values_to_filter['categorie'])) {
-            $sql .= ' AND c.id = :categorie';
-            $params[':categorie'] = $values_to_filter['categorie'];
         }
 
         // Filtrer par titre
@@ -225,10 +257,16 @@ class Article {
             $sql .= ' AND a.content LIKE :contenu';
             $params[':contenu'] = '%' . $values_to_filter['contenu'] . '%';
         }
+        $limit = intval(20);
 
-        $sql .= ' ORDER BY a.created_at DESC LIMIT :limit OFFSET :offset';
-        $params[':limit'] = 20;
-        $params[':offset'] = ($page - 1) * $params['limit'];
+        if ($page <= 0) {
+            $page = 1;
+        }
+
+        $offset  = intval(($page - 1) * $limit);
+
+        $sql .= " ORDER BY a.created_at DESC LIMIT $limit OFFSET $offset";
+
 
         try {
             $conn = get_bdd_connection();
@@ -238,7 +276,7 @@ class Article {
             
             $articles_obj = array();
             foreach ($articles as $article) {
-                $articles_obj[] = new Article($article['id'], $article['title'], $article['content'], User::findById($article['author_id']), $article['created_at'], $article['updated_at']);
+                $articles_obj[] = new Article($article['article_id'], $article['title'], $article['content'], User::findById($article['author_id']), $article['created_at'], $article['updated_at']);
             }
             return $articles_obj;
         } catch (PDOException $e) {

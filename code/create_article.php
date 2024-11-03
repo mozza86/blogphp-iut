@@ -17,31 +17,35 @@ try {
     $username = htmlspecialchars($user->getUsername());
     $avatar_url = $user->getAvatarUrl();
 } catch (UserNotFoundException|DatabaseException $e) {
-    var_dump($e->getMessage());
+    die($e->getMessage());
 }
 
 try {
     $categories = Category::getAll();
 } catch (DatabaseException $e) {
-    var_dump($e->getMessage());
+    echo($e->getMessage());
 }
 
-if (!empty($_POST["title"]) && !empty($_POST["category"]) && !empty($_POST["content"])) {
+if (!empty($_POST["title"]) && !empty($_POST["content"])) {
     $title = $_POST["title"];
-    $category_id = $_POST["category"];
     $content = $_POST['content'];
 
-    $image_url = '';
-    if (!empty($_FILES['image'])) {
-        $image_url = $ARTICLE_IMG_DIR . uniqid() . '.png';
-        if (!move_uploaded_file($_FILES['image']['tmp_name'], $image_url)) {
-            $error_msg = 'Error in file upload';
-            $image_url = '';
+    $categories_obj = [];
+    if (!empty($_POST["categories"])) {
+        $post_categories = $_POST["categories"];
+        for ($i = 0; $i < count($post_categories); $i++) {
+            try {
+                $categories_obj[] = Category::findById($post_categories[$i]);
+            } catch (CategoryNotFoundException $e) {
+                $error_msg .= $e->getMessage();
+            } catch (DatabaseException $e) {
+                $error_msg = $e->getMessage();
+            }
         }
     }
 
     try {
-        $article = Article::create($title, $content, User::findById($_SESSION['user_id']), Category::findById($category_id));
+        $article = Article::create($title, $content, User::findById($_SESSION['user_id']), $categories_obj);
         header('Location: show_article.php?id=' . $article->getId());
     } catch (UserNotFoundException|DatabaseException|CategoryNotFoundException $e) {
         $error_msg = $e->getMessage();
@@ -75,7 +79,7 @@ if (!empty($_POST["title"]) && !empty($_POST["category"]) && !empty($_POST["cont
         </label>
         <label>
             <span>Categorie</span>
-            <select name="category" required>
+            <select name="categories[]" multiple>
                 <?php foreach ($categories as $category): ?>
                     <option value="<?= $category->getId() ?>"><?= htmlspecialchars($category->getName()) ?></option>
                 <?php endforeach; ?>

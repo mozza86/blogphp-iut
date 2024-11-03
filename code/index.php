@@ -1,53 +1,18 @@
 <?php
 require_once "includes/functions.php";
 require_once "includes/Category.php";
+require_once "includes/Article.php";
 require_once 'includes/Exceptions.php';
 
+$articles = [];
 try {
-    $sql = 'SELECT *, a.id as article_id FROM articles a 
-            JOIN users u ON a.author_id = u.id 
-            JOIN article_categories ac ON a.id = ac.article_id 
-            JOIN categories c ON ac.category_id = c.id 
-            WHERE 1=1';
-    $params = [];
-
-    // Filtrer par auteur
-    if (!empty($_POST['auteur'])) {
-        $sql .= ' AND u.username LIKE :auteur';
-        $params[':auteur'] = '%' . $_POST['auteur'] . '%';
-    }
-
-    // Filtrer par catégorie
-    if (!empty($_POST['categorie'])) {
-        $sql .= ' AND c.id = :categorie';
-        $params[':categorie'] = $_POST['categorie'];
-    }
-
-    // Filtrer par titre
-    if (!empty($_POST['titre'])) {
-        $sql .= ' AND a.title LIKE :titre';
-        $params[':titre'] = '%' . $_POST['titre'] . '%';
-    }
-
-    // Filtrer par contenu
-    if (!empty($_POST['contenu'])) {
-        $sql .= ' AND a.content LIKE :contenu';
-        $params[':contenu'] = '%' . $_POST['contenu'] . '%';
-    }
-
-    $sql .= ' ORDER BY a.created_at DESC LIMIT 25';
-
-    $conn = get_bdd_connection();
-    $stmt = $conn->prepare($sql);
-    $stmt->execute($params);
-    $values = $stmt->fetchAll();
-
-} catch (PDOException $e) {
-    echo "Erreur SQL : " . $e->getMessage();
-} catch (DatabaseException $e) {
-    die("Erreur: " . $e->getMessage());
+    $articles = Article::filter($_POST, 1);
+} catch (DatabaseException|UserNotFoundException $e) {
+    echo $e->getMessage();
+    var_dump($e->getPrevious());
 }
 
+$categories = [];
 try {
     $categories = Category::getAll();
 } catch (DatabaseException $e) {
@@ -98,12 +63,16 @@ try {
         <input type="submit" value="Filtrer">
     </form>
     <div class="articles">
-        <?php foreach ($values as $row): ?>
+        <?php foreach ($articles as $article): ?>
             <article>
                 <div class="preview">
-                    <h4><?= htmlspecialchars($row['title']) ?></h4>
-<!--                    <p>--><?php //= htmlspecialchars($row['content']) ?><!--</p>-->
-                    <a href="show_article.php?id=<?= $row['article_id'] ?>">Lire Plus</a>
+                    <h2><?= htmlspecialchars($article->getTitle()) ?></h2>
+                    <p><?= substr(strip_tags($article->getContent()), 0, 350) ?>...</p>
+                    <span><?= count($article->getComments()) ?> Commentaire<?= count($article->getComments()) != 1 ? 's' : '' ?></span>
+                    <span>Catégories: <?php foreach ($article->getCategories() as $category) { echo $category->getName().' ';} ?></span>
+                    <span>Publié par <?= htmlspecialchars($article->getAuthor()->getUsername()) ?> le <?= $article->getUpdatedAt() ?></span>
+
+                    <a href="show_article.php?id=<?= $article->getId() ?>">Lire Plus</a>
                 </div>
             </article>
         <?php endforeach; ?>

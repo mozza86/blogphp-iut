@@ -68,11 +68,13 @@ try {
                 <div class="preview">
                     <h2><?= htmlspecialchars($article->getTitle()) ?></h2>
                     <p><?= substr(strip_tags($article->getContent()), 0, 350) ?>...</p>
+
+                    <a href="show_article.php?id=<?= $article->getId() ?>">Lire Plus</a>
+                    <p></p>
+
                     <span><?= count($article->getComments()) ?> Commentaire<?= count($article->getComments()) != 1 ? 's' : '' ?></span>
                     <span>Catégories: <?php foreach ($article->getCategories() as $category) { echo $category->getName().' ';} ?></span>
                     <span>Publié par <?= htmlspecialchars($article->getAuthor()->getUsername()) ?> le <?= $article->getUpdatedAt() ?></span>
-
-                    <a href="show_article.php?id=<?= $article->getId() ?>">Lire Plus</a>
                 </div>
             </article>
         <?php endforeach; ?>

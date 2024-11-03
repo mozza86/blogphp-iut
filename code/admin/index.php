@@ -17,35 +17,46 @@ try {
         die;
     }
 } catch (UserNotFoundException|DatabaseException $e) {
-    die($e->getMessage());
+    $error_msg = $e->getMessage();
+    require_once '../includes/error_page.php';
+    die;
 }
 
 if (!empty($_POST['action'])) {
     try {
         switch ($_POST['action']) {
             case 'create':
-                Category::create($_POST['name']);
-                refresh_page();
+                if (!empty($_POST['name'])) {
+                    Category::create($_POST['name']);
+                    refresh_page();
+                }
                 break;
             case 'update':
-                Category::findById($_POST['id'])->update($_POST['name']);
-                refresh_page();
+                if (!empty($_POST['name']) && !empty($_POST['id'])) {
+                    Category::findById($_POST['id'])->update($_POST['name']);
+                    refresh_page();
+                }
                 break;
             case 'delete':
-                Category::findById($_POST['id'])->delete();
-                refresh_page();
+                if (!empty($_POST['id'])) {
+                    Category::findById($_POST['id'])->delete();
+                    refresh_page();
+                }
                 break;
         }
     } catch (CategoryNotFoundException|DatabaseException $e) {
-        die($e->getMessage());
+        $error_msg = $e->getMessage();
+        require_once '../includes/error_page.php';
+        die;
     }
 }
 
 try {
     $categories = Category::getAll();
-} catch (PDOException $e) {
-    die($e->getMessage());
 } catch (DatabaseException $e) {
+    $error_msg = $e->getMessage();
+    require_once '../includes/error_page.php';
+    die;
 }
 
 ?>

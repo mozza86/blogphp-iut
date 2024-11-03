@@ -23,7 +23,9 @@ try {
     $article_updated_at = $article->getUpdatedAt();
     $article_created_at = $article->getCreatedAt();
 } catch (DatabaseException|ArticleNotFoundException|UserNotFoundException $e) {
-    die($e->getMessage());
+    $error_msg = $e->getMessage();
+    require_once 'includes/error_page.php';
+    die;
 }
 
 $user = null;
@@ -54,7 +56,9 @@ if (is_connected()) {
         if ($action == "delete_article" && $article->isAllowedToDelete($user)) {
             try {
                 $article->deleteArticle();
-                die("L'article à été supprimé");
+                $error_msg = "L'article à été supprimé";
+                require_once 'includes/error_page.php';
+                die;
             } catch (DatabaseException $e) {
                 $error_msg = $e->getMessage();
             }

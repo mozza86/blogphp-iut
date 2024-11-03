@@ -8,7 +8,9 @@ if (is_connected()) {
         $user = User::findById($_SESSION['user_id'] ?? null);
         $username = htmlspecialchars($user->getUsername());
     } catch (DatabaseException $e) {
-        die($e->getMessage());
+        $error_msg = $e->getMessage();
+        require_once 'includes/error_page.php';
+        die;
     } catch (UserNotFoundException $e) {}
 }
 

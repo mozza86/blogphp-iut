@@ -9,7 +9,7 @@ if (is_connected()) {
         $username = htmlspecialchars($user->getUsername());
         $avatar_url = $user->getAvatarUrl();
     } catch (DatabaseException $e) {
-        var_dump($e->getMessage());
+        die($e->getMessage());
     } catch (UserNotFoundException $e) {}
 }
 

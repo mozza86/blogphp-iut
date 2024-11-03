@@ -8,15 +8,16 @@ $articles = [];
 try {
     $articles = Article::filter($_POST, 1);
 } catch (DatabaseException|UserNotFoundException $e) {
-    echo $e->getMessage();
-    var_dump($e->getPrevious());
+    $error_msg = $e->getMessage();
+    require_once 'includes/error_page.php';
+    die;
 }
 
 $categories = [];
 try {
     $categories = Category::getAll();
 } catch (DatabaseException $e) {
-    echo "Erreur Category::getAll() : " . $e->getMessage();
+    echo "Erreur a la recuperation des categories : " . $e->getMessage();
 }
 ?>
 <!DOCTYPE html>

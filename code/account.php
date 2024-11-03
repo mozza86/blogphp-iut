@@ -15,7 +15,9 @@ try {
     $email = htmlspecialchars($user->getEmail());
     $avatar_url = $user->getAvatarUrl();
 } catch (UserNotFoundException|DatabaseException $e) {
-    die($e->getMessage());
+    $error_msg = $e->getMessage();
+    require_once 'includes/error_page.php';
+    die;
 }
 
 if (isset($_POST['logout'])) {

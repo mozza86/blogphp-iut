@@ -17,13 +17,17 @@ try {
     $username = htmlspecialchars($user->getUsername());
     $avatar_url = $user->getAvatarUrl();
 } catch (UserNotFoundException|DatabaseException $e) {
-    die($e->getMessage());
+    $error_msg = $e->getMessage();
+    require_once 'includes/error_page.php';
+    die;
 }
 
 try {
     $categories = Category::getAll();
 } catch (DatabaseException $e) {
-    echo($e->getMessage());
+    $error_msg = $e->getMessage();
+    require_once 'includes/error_page.php';
+    die;
 }
 
 if (!empty($_POST["title"]) && !empty($_POST["content"])) {

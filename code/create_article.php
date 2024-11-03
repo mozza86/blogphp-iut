@@ -39,19 +39,19 @@ if (!empty($_POST["title"]) && !empty($_POST["content"])) {
         $post_categories = $_POST["categories"];
         for ($i = 0; $i < count($post_categories); $i++) {
             try {
-                $categories_obj[] = Category::findById($post_categories[$i]);
+                $categories_obj[] = Category::findById(intval($post_categories[$i]));
             } catch (CategoryNotFoundException $e) {
                 $error_msg .= $e->getMessage();
             } catch (DatabaseException $e) {
                 $error_msg = $e->getMessage();
-            }
+            } catch (Exception $e) {}
         }
     }
 
     try {
         $article = Article::create($title, $content, User::findById($_SESSION['user_id']), $categories_obj);
         header('Location: show_article.php?id=' . $article->getId());
-    } catch (UserNotFoundException|DatabaseException|CategoryNotFoundException $e) {
+    } catch (UserNotFoundException|DatabaseException $e) {
         $error_msg = $e->getMessage();
     }
 }

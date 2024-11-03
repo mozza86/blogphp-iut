@@ -112,10 +112,21 @@ class Article {
     }
 
     /**
+     * @param int $page
      * @return array
      */
-    public function getComments(): array {
-        return $this->comments;
+    public function getComments(int $page=1): array {
+        $limit = 20;
+        if ($page <= 0) { $page = 1; }
+        $offset  = intval(($page - 1) * $limit);
+        return array_slice($this->comments, $offset, $limit) ;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCommentsCount(): int {
+        return count($this->comments) ;
     }
 
     /**
@@ -257,12 +268,10 @@ class Article {
             $sql .= ' AND a.content LIKE :contenu';
             $params[':contenu'] = '%' . $values_to_filter['contenu'] . '%';
         }
-        $limit = intval(20);
 
-        if ($page <= 0) {
-            $page = 1;
-        }
 
+        $limit = 20;
+        if ($page <= 0) { $page = 1; }
         $offset  = intval(($page - 1) * $limit);
 
         $sql .= " ORDER BY a.created_at DESC LIMIT $limit OFFSET $offset";

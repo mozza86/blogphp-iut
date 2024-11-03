@@ -4,9 +4,13 @@ require_once "includes/Category.php";
 require_once "includes/Article.php";
 require_once 'includes/Exceptions.php';
 
+$page = intval($_GET['page']??1);
+if ($page < 1) {
+    $page = 1;
+}
 $articles = [];
 try {
-    $articles = Article::filter($_POST, 1);
+    $articles = Article::filter($_POST, $page);
 } catch (DatabaseException|UserNotFoundException $e) {
     $error_msg = $e->getMessage();
     require_once 'includes/error_page.php';
@@ -79,6 +83,10 @@ try {
                 </div>
             </article>
         <?php endforeach; ?>
+        <center>
+            <a class="button" href="?page=<?= $page-=1 ?>">< Page précédente</a>
+            <a class="button" href="?page=<?= $page+=2 ?>">Page suivante ></a>
+        </center>
     </div>
 </main>
 </body>

@@ -5,11 +5,18 @@ require_once 'includes/Article.php';
 require_once 'includes/Category.php';
 require_once 'includes/Exceptions.php';
 
-if (empty($_GET['id'])) {
-    die('Aucun article');
+$page = intval($_GET['page']??1);
+if ($page < 1) {
+    $page = 1;
 }
 
-$article_id = $_GET['id'];
+if (empty($_GET['id'])) {
+    $error_msg = 'Aucun article';
+    require_once 'includes/error_page.php';
+    die;
+}
+
+$article_id = intval($_GET['id']);
 try {
     $article = Article::findById($article_id);
     $article_title = htmlspecialchars($article->getTitle());
@@ -79,7 +86,7 @@ if (is_connected()) {
     }
 }
 
-$comments = $article->getComments();
+$comments = $article->getComments($page);
 
 ?>
 
@@ -117,7 +124,7 @@ $comments = $article->getComments();
         </div>
     </div>
     <div class="comments">
-        <h2><?= count($comments) ?> Commentaire<?= count($comments) != 1 ? 's' : '' ?></h2>
+        <h2><?= $article->getCommentsCount() ?> Commentaire<?= count($comments) != 1 ? 's' : '' ?></h2>
         <?php if ($user): ?>
             <form class="new_comment" action="show_article.php?id=<?= $article_id ?>" method="post">
                 <input type="hidden" name="action" value="new_comment">
@@ -156,6 +163,14 @@ $comments = $article->getComments();
                 </div>
             </div>
         <?php endforeach; ?>
+
+        <center>
+            <?php
+            for ($i = 1; $i < ceil($article->getCommentsCount()/20)+1; $i++) {
+                echo "<a class='button' href='?id=$article_id&page=$i'>Page $i</a>";
+            }
+            ?>
+        </center>
     </div>
 </main>
 </body>

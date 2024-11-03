@@ -128,6 +128,8 @@ $comments = $article->getComments();
                     <textarea name="comment" id="new_comment" placeholder="Nouveau commentaire"></textarea>
                 </div>
             </form>
+        <?php else: ?>
+            <a href="login.php?return=Article&rid=<?= $article_id ?>">Connectez vous pour écrire un commentaire</a>
         <?php endif; ?>
 
         <?php foreach ($comments as $comment): ?>

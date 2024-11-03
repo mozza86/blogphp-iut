@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS `articles` (
   `title` text NOT NULL,
   `content` text NOT NULL,
   `author_id` int NOT NULL,
-  `image_url` text NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -24,8 +23,8 @@ CREATE TABLE IF NOT EXISTS `articles` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 TRUNCATE TABLE `articles`;
-INSERT INTO `articles` (`id`, `title`, `content`, `author_id`, `image_url`, `created_at`, `updated_at`) VALUES
-(1, 'Un gros gateau', 'il est beau mon lavabo', 1, '', '2024-11-02 21:18:25', '2024-11-02 21:18:25');
+INSERT INTO `articles` (`id`, `title`, `content`, `author_id`, `created_at`, `updated_at`) VALUES
+(1, 'Un gros gateau', 'il est beau mon lavabo', 1, '2024-11-02 21:18:25', '2024-11-02 21:18:25');
 
 DROP TABLE IF EXISTS `article_categories`;
 CREATE TABLE IF NOT EXISTS `article_categories` (

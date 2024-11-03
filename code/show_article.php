@@ -13,7 +13,6 @@ $article_id = $_GET['id'];
 try {
     $article = Article::findById($article_id);
     $article_title = htmlspecialchars($article->getTitle());
-    $article_image = $article->getImageUrl();
 
     require_once 'includes/htmlpurifier-4.15.0-standalone/HTMLPurifier.standalone.php';
     $purifier = new HTMLPurifier();
@@ -102,7 +101,6 @@ $comments = $article->getComments();
                 <input type="submit" value="Supprimer l'article">
             </form>
         <?php endif; ?>
-        <img class="article_img" src="<?= $article_image ?>" alt="">
         <div>
             <?= $article_content ?>
         </div>

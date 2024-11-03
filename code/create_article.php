@@ -41,7 +41,7 @@ if (!empty($_POST["title"]) && !empty($_POST["category"]) && !empty($_POST["cont
     }
 
     try {
-        $article = Article::create($title, $content, User::findById($_SESSION['user_id']), $image_url, Category::findById($category_id));
+        $article = Article::create($title, $content, User::findById($_SESSION['user_id']), Category::findById($category_id));
         header('Location: show_article.php?id=' . $article->getId());
     } catch (UserNotFoundException|DatabaseException|CategoryNotFoundException $e) {
         $error_msg = $e->getMessage();

@@ -1,7 +1,9 @@
 <?php
 require_once "includes/functions.php";
+require_once 'includes/User.php';
 require_once 'includes/Article.php';
 require_once 'includes/Category.php';
+require_once 'includes/Exceptions.php';
 
 if (empty($_GET['id'])) {
     die('Aucun article');
@@ -12,12 +14,12 @@ try {
     $article = Article::findById($article_id);
     $article_title = htmlspecialchars($article->getTitle());
     $article_image = $article->getImageUrl();
-    $article_content = htmlspecialchars($article->getContent());
+    $article_content = ($article->getContent());
     $author_avatar = $article->getAuthor()->getAvatarUrl();
     $author_username = htmlspecialchars($article->getAuthor()->getUsername());
     $article_updated_at = $article->getUpdatedAt();
     $article_created_at = $article->getCreatedAt();
-} catch (SQLException|ArticleNotFoundException|UserNotFoundException $e) {
+} catch (DatabaseException|ArticleNotFoundException|UserNotFoundException $e) {
     die($e->getMessage());
 }
 
@@ -27,7 +29,7 @@ if (is_connected()) {
         $user = User::findById($_SESSION['user_id'] ?? null);
         $username = htmlspecialchars($user->getUsername());
         $avatar_url = $user->getAvatarUrl();
-    } catch (SQLException $e) {
+    } catch (DatabaseException $e) {
         $error_msg = $e->getMessage();
     } catch (UserNotFoundException $e) {
         $user = null;
@@ -41,7 +43,7 @@ if (is_connected()) {
             try {
                 Comment::create($content, $user, $article);
                 refresh_page();
-            } catch (SQLException $e) {
+            } catch (DatabaseException $e) {
                 $error_msg = $e->getMessage();
             }
         }
@@ -50,7 +52,7 @@ if (is_connected()) {
             try {
                 $article->deleteArticle();
                 die("L'article à été supprimé");
-            } catch (SQLException $e) {
+            } catch (DatabaseException $e) {
                 $error_msg = $e->getMessage();
             }
         }
@@ -63,7 +65,7 @@ if (is_connected()) {
                     $comment->delete();
                     refresh_page();
                 }
-            } catch (ArticleNotFoundException|CommentNotFoundException|SQLException|UserNotFoundException $e) {
+            } catch (ArticleNotFoundException|CommentNotFoundException|DatabaseException|UserNotFoundException $e) {
                 $error_msg = $e->getMessage();
             }
         }
@@ -78,7 +80,8 @@ $comments = $article->getComments();
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Blog - Article</title>
     <link rel="stylesheet" href="res/css/style.css">
@@ -90,7 +93,7 @@ $comments = $article->getComments();
     <div class="article_content">
         <h1><?= $article_title ?></h1>
         <?php if ($user && $article->isAllowedToDelete($user)): ?>
-            <form action="article.php?id=<?= $article_id ?>" method="post">
+            <form action="show_article.php?id=<?= $article_id ?>" method="post">
                 <input type="hidden" name="action" value="delete_article">
                 <input type="submit" value="Supprimer l'article">
             </form>
@@ -104,45 +107,46 @@ $comments = $article->getComments();
         <img src="<?= $author_avatar ?>" alt="l'image de l'auteur">
         <div class="infos">
             <span class="username"><?= $author_username ?></span>
-            <span class="date">Publié le <?= $article_created_at ?><?= (($article_updated_at != $article_created_at ? ", mis à jour le $article_updated_at" : ''))?></span>
+            <span class="date">Publié le <?= $article_created_at ?><?= (($article_updated_at != $article_created_at ? ", mis à jour le $article_updated_at" : '')) ?></span>
         </div>
     </div>
     <div class="comments">
-        <h2><?= count($comments) ?> Commentaire<?= count($comments)!=1?'s':'' ?></h2>
+        <h2><?= count($comments) ?> Commentaire<?= count($comments) != 1 ? 's' : '' ?></h2>
         <?php if ($user): ?>
-        <form class="new_comment" action="article.php?id=<?= $article_id ?>" method="post">
-            <input type="hidden" name="action" value="new_comment">
-            <div class="top">
-                <label for="new_comment">Nouveau commentaire</label>
-                <input type="submit" value="Envoyer">
-            </div>
-            <div class="bottom">
-                <img src="<?= $avatar_url ?>" alt="Avatar de <?= $username ?>">
-                <textarea name="comment" id="new_comment" placeholder="Nouveau commentaire"></textarea>
-            </div>
-        </form>
+            <form class="new_comment" action="show_article.php?id=<?= $article_id ?>" method="post">
+                <input type="hidden" name="action" value="new_comment">
+                <div class="top">
+                    <label for="new_comment">Nouveau commentaire</label>
+                    <input type="submit" value="Envoyer">
+                </div>
+                <div class="bottom">
+                    <img src="<?= $avatar_url ?>" alt="Avatar de <?= $username ?>">
+                    <textarea name="comment" id="new_comment" placeholder="Nouveau commentaire"></textarea>
+                </div>
+            </form>
         <?php endif; ?>
 
         <?php foreach ($comments as $comment): ?>
-        <div class="comment">
-            <img src="<?= $comment->getAuthor()->getAvatarUrl() ?>" alt="Avatar de <?= htmlspecialchars($comment->getAuthor()->getUsername()) ?>">
-            <div class="content">
-                <div class="top">
-                    <span class="username"><?= htmlspecialchars($comment->getAuthor()->getUsername()) ?></span>
-                    <span class="date"><?= $comment->getCreatedAt() ?></span>
-                    <?php if ($user && $comment->isAllowedToDelete($user)): ?>
-                        <form action="article.php?id=<?= $article_id ?>" method="post">
-                            <input type="hidden" name="action" value="delete_comment">
-                            <input type="hidden" name="comment_id" value="<?= $comment->getId() ?>">
-                            <input type="submit" value="Supprimer">
-                        </form>
-                    <?php endif; ?>
-                </div>
-                <div class="bottom">
-                    <?= htmlspecialchars($comment->getContent()) ?>
+            <div class="comment">
+                <img src="<?= $comment->getAuthor()->getAvatarUrl() ?>"
+                     alt="Avatar de <?= htmlspecialchars($comment->getAuthor()->getUsername()) ?>">
+                <div class="content">
+                    <div class="top">
+                        <span class="username"><?= htmlspecialchars($comment->getAuthor()->getUsername()) ?></span>
+                        <span class="date"><?= $comment->getCreatedAt() ?></span>
+                        <?php if ($user && $comment->isAllowedToDelete($user)): ?>
+                            <form action="show_article.php?id=<?= $article_id ?>" method="post">
+                                <input type="hidden" name="action" value="delete_comment">
+                                <input type="hidden" name="comment_id" value="<?= $comment->getId() ?>">
+                                <input type="submit" value="Supprimer">
+                            </form>
+                        <?php endif; ?>
+                    </div>
+                    <div class="bottom">
+                        <?= htmlspecialchars($comment->getContent()) ?>
+                    </div>
                 </div>
             </div>
-        </div>
         <?php endforeach; ?>
     </div>
 </main>

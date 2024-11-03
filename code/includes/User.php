@@ -1,5 +1,6 @@
 <?php
 require_once 'bdd.php';
+require_once 'Exceptions.php';
 
 $DEFAULT_AVATAR_URL = 'res/img/default-avatar.png';
 
@@ -11,7 +12,16 @@ class User {
     private string $avatar_url;
     private bool $admin;
 
-    function __construct($id, $username, $email, $password, $avatar_url, $admin) {
+    /**
+     * User object
+     * @param int $id
+     * @param string $username
+     * @param string $email
+     * @param string $password
+     * @param string $avatar_url
+     * @param bool $admin
+     */
+    function __construct(int $id, string $username, string $email, string $password, string $avatar_url, bool $admin) {
         $this->id = $id;
         $this->username = $username;
         $this->email = $email;
@@ -20,33 +30,62 @@ class User {
         $this->admin = $admin;
     }
 
+    /**
+     * Return true if the user is an administrator otherwise return false
+     * @return bool
+     */
     public function isAdmin(): bool {
         return boolval($this->admin ?? 0);
     }
-    public function isArticleOwner($article): bool {
-        return $article->is_author($this->id) ?? false;
-    }
-    public function verifyPassword($password): bool {
+
+    /**
+     * Return true if the stored password match the given password otherwise return false
+     * @param string $password
+     * @return bool
+     */
+    public function verifyPassword(string $password): bool {
         return password_verify($password, $this->password ?? '');
     }
 
+    /**
+     * Get the user id
+     * @return int
+     */
     public function getId(): int {
         return $this->id;
     }
 
+    /**
+     * Get the username
+     * @return string
+     */
     public function getUsername(): string {
         return $this->username;
     }
 
+    /**
+     * Get the user email
+     * @return string
+     */
     public function getEmail(): string {
         return $this->email;
     }
 
+    /**
+     * Get the avatar url of the user
+     * @return string
+     */
     public function getAvatarUrl(): string {
         return $this->avatar_url;
     }
 
-    public function setAvatarUrl($avatar_url): void {
+    /**
+     * Update the avatar url
+     * @param string $avatar_url
+     * @return void
+     * @throws DatabaseException
+     */
+    public function setAvatarUrl(string $avatar_url): void {
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare('UPDATE users SET avatar_url = ? WHERE id = ?');
@@ -54,10 +93,16 @@ class User {
 
             $this->avatar_url = $avatar_url;
         } catch (PDOException $e) {
-            throw new SQLException($e->getMessage());
+            throw new DatabaseException("Erreur lors de la requête à la base de données", 0, $e);
         }
     }
 
+    /**
+     * Update the username
+     * @param string $username
+     * @return void
+     * @throws DatabaseException
+     */
     public function setUsername(string $username): void {
         try {
             $conn = get_bdd_connection();
@@ -66,10 +111,16 @@ class User {
 
             $this->username = $username;
         } catch (PDOException $e) {
-            throw new SQLException($e->getMessage());
+            throw new DatabaseException("Erreur lors de la requête à la base de données", 0, $e);
         }
     }
 
+    /**
+     * Update the email
+     * @param string $email
+     * @return void
+     * @throws DatabaseException
+     */
     public function setEmail(string $email): void {
         try {
             $conn = get_bdd_connection();
@@ -78,10 +129,16 @@ class User {
 
             $this->email = $email;
         } catch (PDOException $e) {
-            throw new SQLException($e->getMessage());
+            throw new DatabaseException("Erreur lors de la requête à la base de données", 0, $e);
         }
     }
 
+    /**
+     * Hash and update the password
+     * @param string $password
+     * @return void
+     * @throws DatabaseException
+     */
     public function setPassword(string $password): void {
         $hash = password_hash($password, PASSWORD_DEFAULT);
         try {
@@ -91,43 +148,66 @@ class User {
 
             $this->password = $hash;
         } catch (PDOException $e) {
-            throw new SQLException($e->getMessage());
+            throw new DatabaseException("Erreur lors de la requête à la base de données", 0, $e);
         }
     }
 
+    /**
+     * Delete a user
+     * @return void
+     * @throws DatabaseException
+     */
     public function delete(): void {
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
             $stmt->execute([$this->id]);
         } catch (PDOException $e) {
-            throw new SQLException($e->getMessage());
+            throw new DatabaseException("Erreur lors de la requête à la base de données", 0, $e);
         }
     }
 
-    public static function loginOrCreate($email, $password): User {
+    /**
+     * Try to log in the user if the user exists, otherwise create it
+     * @param string $email
+     * @param string $password
+     * @return User
+     * @throws DatabaseException
+     * @throws IncorrectPasswordException
+     * @throws InvalidEmailException
+     */
+    public static function loginOrCreate(string $email, string $password): User {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidEmailException("Email invalide");
         }
         try {
-            try {
-                $user = User::findByEmail($email);
-                if (!$user->verifyPassword($password)) {
-                    throw new IncorrectPasswordException("Mauvais mot de passe");
-                }
-            } catch (UserNotFoundException $e) {
-                return User::create($email, $password);
-            } catch (SQLException $e) {
-                throw new SQLException($e->getMessage());
+            $user = User::findByEmail($email);
+            if (!$user->verifyPassword($password)) {
+                throw new IncorrectPasswordException("Mauvais mot de passe");
             }
-
             return $user;
-        } catch (PDOException $e) {
-            throw new SQLException($e->getMessage());
+        } catch (DatabaseException $e) {
+            throw new DatabaseException("Erreur lors de la requête à la base de données", 0, $e);
+        } catch (UserNotFoundException $e) {
+            try {
+                return User::create($email, $password);
+            } catch (InvalidEmailException $e) {
+                throw new InvalidEmailException($e->getMessage(), 0, $e);
+            } catch (DatabaseException $e) {
+                throw new DatabaseException("Erreur lors de la requête à la base de données", 0, $e);
+            }
         }
     }
 
-    public static function create($email, $password): User {
+    /**
+     * Create a new user object and insert it to the db
+     * @param string $email
+     * @param string $password
+     * @return User
+     * @throws DatabaseException
+     * @throws InvalidEmailException
+     */
+    public static function create(string $email, string $password): User {
         global $DEFAULT_AVATAR_URL;
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidEmailException("Email invalide");
@@ -141,11 +221,18 @@ class User {
 
             return new User($conn->lastInsertId(), $email, $email, $hash, $DEFAULT_AVATAR_URL, $email);
         } catch (PDOException $e) {
-            throw new SQLException($e->getMessage());
+            throw new DatabaseException("Erreur lors de la requête à la base de données", 0, $e);
         }
     }
 
-    public static function findById($id): ?User {
+    /**
+     * Return a user object or an error if it doesn't find the user
+     * @param int $id
+     * @return User|null
+     * @throws DatabaseException
+     * @throws UserNotFoundException
+     */
+    public static function findById(int $id): ?User {
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare('SELECT * FROM users where id = ?');
@@ -158,10 +245,18 @@ class User {
 
             throw new UserNotFoundException("L'utilisateur $id n'existe pas");
         } catch (PDOException $e) {
-            throw new SQLException($e->getMessage());
+            throw new DatabaseException("Erreur lors de la requête à la base de données", 0, $e);
         }
     }
-    public static function findByEmail($email): ?User {
+
+    /**
+     * Return a user object or an error if it doesn't find the user
+     * @param string $email
+     * @return User
+     * @throws DatabaseException
+     * @throws UserNotFoundException
+     */
+    public static function findByEmail(string $email): User {
         try {
             $conn = get_bdd_connection();
             $stmt = $conn->prepare('SELECT * FROM users where email = ?');
@@ -172,10 +267,10 @@ class User {
                 return new User($user['id'], $user['username'], $user['email'], $user['password'], $user['avatar_url'], $user['admin']);
             }
 
-            $htmlemail = htmlentities($email);
+            $htmlemail = htmlspecialchars($email);
             throw new UserNotFoundException("L'utilisateur $htmlemail n'existe pas");
         } catch (PDOException $e) {
-            throw new SQLException($e->getMessage());
+            throw new DatabaseException("Erreur lors de la requête à la base de données", 0, $e);
         }
     }
 }

@@ -1,15 +1,16 @@
 <?php
 require_once "functions.php";
 require_once 'User.php';
+require_once 'Exceptions.php';
 
 if (is_connected()) {
     try {
         $user = User::findById($_SESSION['user_id'] ?? null);
         $username = htmlspecialchars($user->getUsername());
-        $avatar_url = htmlspecialchars($user->getAvatarUrl());
-    } catch (UserNotFoundException|SQLException $e) {
-        $error_msg = $e->getMessage();
-    }
+        $avatar_url = $user->getAvatarUrl();
+    } catch (DatabaseException $e) {
+        var_dump($e->getMessage());
+    } catch (UserNotFoundException $e) {}
 }
 
 if (empty($__PAGE_PREFIX)) {

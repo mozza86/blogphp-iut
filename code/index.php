@@ -1,16 +1,7 @@
 <?php
 require_once "includes/functions.php";
 require_once "includes/Category.php";
-
-if (is_connected()) {
-    try {
-        $user = User::findById($_SESSION['user_id'] ?? null);
-        $username = htmlspecialchars($user->getUsername());
-        $avatar_url = $user->getAvatarUrl();
-    } catch (UserNotFoundException|SQLException $e) {
-        $error_msg = $e->getMessage();
-    }
-}
+require_once 'includes/Exceptions.php';
 
 try {
     $sql = 'SELECT *, a.id as article_id FROM articles a 
@@ -53,11 +44,13 @@ try {
 
 } catch (PDOException $e) {
     echo "Erreur SQL : " . $e->getMessage();
+} catch (DatabaseException $e) {
+    die("Erreur: " . $e->getMessage());
 }
 
 try {
     $categories = Category::getAll();
-} catch (SQLException $e) {
+} catch (DatabaseException $e) {
     echo "Erreur Category::getAll() : " . $e->getMessage();
 }
 ?>
@@ -65,56 +58,56 @@ try {
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Blog</title>
     <link rel="stylesheet" href="res/css/style.css">
 </head>
 <body>
-    <header>
-        <h1>Le blog</h1>
-    </header>
-    <?php require_once "includes/header.php"; ?>
-    <main class="home">
-        <form method="POST" class="filters">
-            <h2><label>Filtres<input type="checkbox" class="toggle_filters"></label></h2>
+<header>
+    <h1>Le blog</h1>
+</header>
+<?php require_once "includes/header.php"; ?>
+<main class="home">
+    <form method="POST" class="filters">
+        <h2><label>Filtres<input type="checkbox" class="toggle_filters"></label></h2>
 
-            <label>
-                <span>Auteur</span>
-                <input type="text" name="auteur" placeholder="Auteur">
-            </label>
-            <label>
-                <span>Catégorie</span>
-                <select name="categorie">
-                    <option value="">Toutes</option>
-                    <?php foreach ($categories as $category): ?>
-                        <option value="<?= $category->getId() ?>"><?= htmlspecialchars($category->getName()) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </label>
-            <label>
-                <span>Titre</span>
-                <input type="text" name="titre" placeholder="Titre">
-            </label>
-            <label>
-                <span>Contenu</span>
-                <input type="text" name="contenu" placeholder="Contenu">
-            </label>
+        <label>
+            <span>Auteur</span>
+            <input type="text" name="auteur" placeholder="Auteur">
+        </label>
+        <label>
+            <span>Catégorie</span>
+            <select name="categorie">
+                <option value="">Toutes</option>
+                <?php foreach ($categories as $category): ?>
+                    <option value="<?= $category->getId() ?>"><?= htmlspecialchars($category->getName()) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+        <label>
+            <span>Titre</span>
+            <input type="text" name="titre" placeholder="Titre">
+        </label>
+        <label>
+            <span>Contenu</span>
+            <input type="text" name="contenu" placeholder="Contenu">
+        </label>
 
-            <input type="submit" value="Filtrer">
-        </form>
-        <div class="articles">
-            <?php foreach ($values as $row): ?>
-                <article>
-                    <img src="<?= $row['image_url'] ?>" alt="Image de l'article">
-                    <div class="preview">
-                        <h4><?= htmlspecialchars($row['title']) ?></h4>
-                        <p><?= htmlspecialchars($row['content']) ?></p>
-                        <a href="article.php?id=<?= $row['article_id'] ?>">Lire Plus</a>
-                    </div>
-                </article>
-            <?php endforeach; ?>
-        </div>
-    </main>
+        <input type="submit" value="Filtrer">
+    </form>
+    <div class="articles">
+        <?php foreach ($values as $row): ?>
+            <article>
+                <div class="preview">
+                    <h4><?= htmlspecialchars($row['title']) ?></h4>
+<!--                    <p>--><?php //= htmlspecialchars($row['content']) ?><!--</p>-->
+                    <a href="show_article.php?id=<?= $row['article_id'] ?>">Lire Plus</a>
+                </div>
+            </article>
+        <?php endforeach; ?>
+    </div>
+</main>
 </body>
 </html>

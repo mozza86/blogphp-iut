@@ -1,6 +1,5 @@
 <?php
-class ObjectNotFoundException extends Exception{}
-class SQLException extends Exception{}
+class DatabaseException extends Exception{}
 
 class UserException extends Exception{}
 class IncorrectPasswordException extends UserException{}
@@ -12,3 +11,6 @@ class ArticleNotFoundException extends ArticleException{}
 
 class CommentException extends Exception{}
 class CommentNotFoundException extends CommentException{}
+
+class CategoryException extends Exception{}
+class CategoryNotFoundException extends CategoryException{}

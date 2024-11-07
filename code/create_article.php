@@ -73,6 +73,7 @@ if (!empty($_POST["title"]) && !empty($_POST["content"])) {
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/lang/summernote-fr-FR.js"></script>
+
 </head>
 <body>
 <?php require_once "includes/header.php"; ?>

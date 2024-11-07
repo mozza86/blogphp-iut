@@ -116,7 +116,7 @@ class Article {
      * @return array
      */
     public function getComments(int $page=1): array {
-        $limit = 20;
+        $limit = 2;
         if ($page <= 0) { $page = 1; }
         $offset  = intval(($page - 1) * $limit);
         return array_slice($this->comments, $offset, $limit) ;
@@ -270,7 +270,7 @@ class Article {
         }
 
 
-        $limit = 20;
+        $limit = 5;
         if ($page <= 0) { $page = 1; }
         $offset  = intval(($page - 1) * $limit);
 

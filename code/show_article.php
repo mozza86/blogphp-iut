@@ -166,7 +166,7 @@ $comments = $article->getComments($page);
 
         <center>
             <?php
-            for ($i = 1; $i < ceil($article->getCommentsCount()/20)+1; $i++) {
+            for ($i = 1; $i < ceil($article->getCommentsCount()/2)+1; $i++) {
                 echo "<a class='button' href='?id=$article_id&page=$i'>Page $i</a>";
             }
             ?>
